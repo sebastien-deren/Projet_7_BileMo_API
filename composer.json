@@ -10,13 +10,17 @@
         "doctrine/doctrine-bundle": "^2.9",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.15",
+        "jms/serializer": "^3.23",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
+        "symfony/expression-language": "6.2.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "6.2.*",
         "symfony/maker-bundle": "^1.48",
         "symfony/runtime": "6.2.*",
-        "symfony/yaml": "6.2.*"
+        "symfony/serializer": "6.2.*",
+        "symfony/yaml": "6.2.*",
+        "willdurand/hateoas": "^3.9"
     },
     "config": {
         "allow-plugins": {
