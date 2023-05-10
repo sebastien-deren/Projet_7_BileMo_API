@@ -2,18 +2,30 @@
 
 namespace App\Service;
 
+use App\Entity\Product;
+use App\Repository\ProductRepository;
+use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
+
 class ProductService
 {
     public function __construct(
-        private ProductRepository $repository,
+        private readonly ProductRepository $repository,
     )
     {
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function productList(): Product
     {
-        return $this->repository->findAll();
-
+        $cache = new FilesystemAdapter();
+        return $cache->get('product_list',function(ItemInterface $item){
+            $item->expiresAfter('5000');
+            return $this->repository->findAll();
+        });
     }
 
 }

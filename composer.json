@@ -12,6 +12,7 @@
         "doctrine/orm": "^2.15",
         "jms/serializer": "^3.23",
         "lexik/jwt-authentication-bundle": "^2.19",
+        "symfony/cache": "6.2.*",
         "symfony/console": "6.2.*",
         "symfony/dotenv": "6.2.*",
         "symfony/expression-language": "6.2.*",
