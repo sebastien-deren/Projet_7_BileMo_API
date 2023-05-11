@@ -29,5 +29,4 @@ class ProductControllerTest extends WebTestCase
         $this->assertTrue(isset($responseData['_embedded']['items']));
 
     }
-
 }
