@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\DTO\PaginationDto;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,6 +19,7 @@ class ProductRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
+
         parent::__construct($registry, Product::class);
     }
 
@@ -37,6 +39,19 @@ class ProductRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+    public function findAllWithPagination(int $page, int $limit)
+    {
+        $count = $this->createQueryBuilder('a')
+            ->select('count(a.id)' )
+            ->getQuery()
+            ->getSingleScalarResult();
+        $maxpage = ($count/$limit)+1;
+        $query = $this->createQueryBuilder('paginagation')
+            ->setFirstResult(($page-1)*$limit)
+            ->setMaxResults($limit);
+        return new PaginationDto($page,$limit,$maxpage,$query->getQuery()->getResult());
+
     }
 
 //    /**
