@@ -4,16 +4,29 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Groups;
 
+
+/**
+ * @Serializer\XmlRoot("product")
+ *
+ *
+ * @Hateoas\Relation("list", href=@Hateoas\Route("app_product_list",absolute=true))
+ * @Hateoas\Relation("self", href="expr('api/products/' ~ object.getId())")
+ */
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['productList'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productList'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
