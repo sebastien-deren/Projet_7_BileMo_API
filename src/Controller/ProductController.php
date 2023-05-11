@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ProductRepository;
 use App\Service\ProductService;
 use JMS\Serializer\SerializerInterface;
 use Psr\Cache\InvalidArgumentException;
@@ -16,7 +17,7 @@ class ProductController extends AbstractController
      * @throws InvalidArgumentException
      */
     #[Route('products/', name: 'app_product_list',methods:'get')]
-    public function list(ProductService $productService, serializerInterface $serializer): JsonResponse
+    public function list(ProductService $productService, SerializerInterface $serializer,ProductRepository $repository): JsonResponse
     {
         try {
             $productList = $productService->productList();
