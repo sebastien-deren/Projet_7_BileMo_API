@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Repository;
 
@@ -40,13 +40,13 @@ class ProductRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    public function findAllWithPagination(int $page, int $limit)
+    public function findAllWithPagination(int $page = 1 , int $limit =5):PaginationDto
     {
         $count = $this->createQueryBuilder('a')
             ->select('count(a.id)' )
             ->getQuery()
             ->getSingleScalarResult();
-        $maxpage = ($count/$limit)+1;
+        $maxpage = (int)($count/$limit)+1;
         $query = $this->createQueryBuilder('paginagation')
             ->setFirstResult(($page-1)*$limit)
             ->setMaxResults($limit);

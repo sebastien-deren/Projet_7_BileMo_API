@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Controller;
 
@@ -30,8 +30,12 @@ class ProductController extends AbstractController
                          SerializerInterface $serializer): JsonResponse
     {
 
-        $page = $request->query->get('page', 1);
-        $limit = $request->query->get('limit', 5);
+        $page = (int)$request->query->get('page', 0);
+        $limit = (int)$request->query->get('limit', 5);
+        if(0===$page || $limit>100){
+            $serializedData = $serializerService->serializeList($productService->productList());
+            return new JsonResponse($serializedData, Response::HTTP_OK, [], true);
+        }
         $paginationObject = $productService->productListPaginated($page, $limit);
         $serializedData = $serializerService->paginator('productList', $paginationObject);
 

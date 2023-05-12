@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Service;
 
@@ -25,19 +25,32 @@ class ProductService
     public function productList(): array
     {
             $cache = new FilesystemTagAwareAdapter();
-            $cache->invalidateTags(['products']);
             return $cache->get('product_list', function (ItemInterface $item) {
                 $item->tag('products');
                 $item->expiresAfter(5000);
                 return $this->repository->findAll();
             });
     }
-    public function productListPaginated(int $page, int $limit):PaginationDto
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function productListPaginatedCached(int $page, int $limit):PaginationDto
     {
 
         $cache = new FilesystemTagAwareAdapter();
-        return $this->repository->findAllWithPagination($page,$limit);
+        $cacheCallback = function (ItemInterface $item) use ($limit, $page) {
+            $item->tag('products');
+            $item->expiresAfter(3600);
+            return $this->repository->findAllWithPagination($page,$limit);
+        };
+        return $cache->get('product_list'.$page.'limit'.$limit,$cacheCallback);
 
+
+    }
+    public function productListPaginated(int $page, int $limit):PaginationDto
+    {
+        return $this->repository->findAllWithPagination($page,$limit);
     }
 
 }
