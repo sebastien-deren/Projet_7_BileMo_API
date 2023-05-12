@@ -8,15 +8,13 @@ use PHPUnit\Framework\TestCase;
 
 class SerializerServiceTest extends TestCase
 {
-    public function testPaginatorReturnJson(){
 
-        $context = $this->getMockBuilder()
-            ->disableOriginalConstructor()
-            ->addMethods();
-
-        $this->assertContains('first',$context);
-
-    }
+    /**
+     * @return void
+     *
+     * The serializer Service only aim is to serialize data, we can test it by mocking the serializer object.
+     * But by doing so we do not have anything left in our Service.
+     */
     public function testSomething(): void
     {
         $this->assertTrue(true);

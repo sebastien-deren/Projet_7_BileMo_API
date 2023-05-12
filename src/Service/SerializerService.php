@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Service;
 
@@ -29,6 +29,11 @@ class SerializerService
             $paginationObject->maxPage,
         );
         return $this->serializer->serialize($list, 'json');
+    }
+
+    public function serializeList(array $productList):string
+    {
+        return $this->serializer->serialize($productList,'json');
     }
 
 

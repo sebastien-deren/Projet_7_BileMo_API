@@ -14,9 +14,9 @@ class ProductControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
     }
-    public function testProductListreturnGoodJson(){
+    public function testProductListPaginatedReturnGoodJson(){
         $urlGenerator = $this->client->getContainer()->get('router.default');
-        $crawler =$this->client->request(Request::METHOD_GET,$urlGenerator->generate('app_product_list'));
+        $this->client->request(Request::METHOD_GET,$urlGenerator->generate('app_product_list',["page"=>1,"limit"=>5]));
         $response = $this->client->getResponse();
         $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
         $this->assertJson($response->getContent());
@@ -28,5 +28,12 @@ class ProductControllerTest extends WebTestCase
             &&(array_key_exists('last',$linksPagination)));
         $this->assertTrue(isset($responseData['_embedded']['items']));
 
+    }
+    public function testProductListFullReturnGoodJson(){
+        $urlGenerator = $this->client->getContainer()->get('router.default');
+        $this->client->request(Request::METHOD_GET,$urlGenerator->generate('app_product_list'));
+        $response = $this->client->getResponse();
+        $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
+        $this->assertJson($response->getContent());
     }
 }
