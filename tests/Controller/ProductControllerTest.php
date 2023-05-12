@@ -21,7 +21,9 @@ class ProductControllerTest extends WebTestCase
         $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
         $this->assertJson($response->getContent());
         $responseData = json_decode($response->getContent(), true);
+        $this->assertTrue(is_array($responseData));
         $linksPagination=$responseData['_links'];
+        echo($linksPagination);
         $this->assertTrue(
             (array_key_exists('self',$linksPagination))
             &&(array_key_exists('first',$linksPagination))
