@@ -18,12 +18,16 @@ class ProductControllerTest extends WebTestCase
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET,$urlGenerator->generate('app_product_list',["page"=>1,"limit"=>5]));
         $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK,$response->getStatusCode());
         $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
         $this->assertJson($response->getContent());
         $responseData = json_decode($response->getContent(), true);
         $this->assertTrue(is_array($responseData));
+        if(is_string($responseData)){
+            echo ($responseData);
+            return;
+        }
         $linksPagination=$responseData['_links'];
-        echo($linksPagination);
         $this->assertTrue(
             (array_key_exists('self',$linksPagination))
             &&(array_key_exists('first',$linksPagination))
@@ -35,6 +39,7 @@ class ProductControllerTest extends WebTestCase
         $urlGenerator = $this->client->getContainer()->get('router.default');
         $this->client->request(Request::METHOD_GET,$urlGenerator->generate('app_product_list'));
         $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK,$response->getStatusCode());
         $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
         $this->assertJson($response->getContent());
     }
