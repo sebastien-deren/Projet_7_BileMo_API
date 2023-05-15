@@ -8,5 +8,5 @@ return [
     JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
     Bazinga\Bundle\HateoasBundle\BazingaHateoasBundle::class => ['all' => true],
     Doctrine\Bundle\FixturesBundle\DoctrineFixturesBundle::class => ['dev' => true, 'test' => true],
-    DAMA\DoctrineTestBundle\DAMADoctrineTestBundle::class => ['test' => true],
+    //DAMA\DoctrineTestBundle\DAMADoctrineTestBundle::class => ['test' => true],
 ];

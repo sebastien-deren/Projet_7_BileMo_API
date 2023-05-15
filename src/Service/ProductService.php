@@ -18,39 +18,14 @@ class ProductService
     {
     }
 
-    /**
-     * @return array<Product>
-     * @throws InvalidArgumentException
-     */
     public function productList(): array
     {
-            $cache = new FilesystemTagAwareAdapter();
-            return $cache->get('product_list', function (ItemInterface $item) {
-                $item->tag('products');
-                $item->expiresAfter(5000);
-                return $this->repository->findAll();
-            });
+        return $this->repository->findAll();
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
-    public function productListPaginatedCached(int $page, int $limit):PaginationDto
+    public function productListPaginated(int $page, int $limit): PaginationDto
     {
-
-        $cache = new FilesystemTagAwareAdapter();
-        $cacheCallback = function (ItemInterface $item) use ($limit, $page) {
-            $item->tag('products');
-            $item->expiresAfter(3600);
-            return $this->repository->findAllWithPagination($page,$limit);
-        };
-        return $cache->get('product_list'.$page.'limit'.$limit,$cacheCallback);
-
-
-    }
-    public function productListPaginated(int $page, int $limit):PaginationDto
-    {
-        return $this->repository->findAllWithPagination($page,$limit);
+        return $this->repository->findAllWithPagination($page, $limit);
     }
 
 }
