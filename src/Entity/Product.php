@@ -30,21 +30,27 @@ class Product
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productList'])]
     private ?string $brand = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productsDetail'])]
     private ?string $operatingSystem = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?int $screensize = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?int $numberOfPhoto = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?string $resolution = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?int $photoResolution = null;
 
     public function getId(): ?int

@@ -18,17 +18,18 @@ class SerializerService
     public function paginator(string $group, PaginationDto $paginationObject): string
     {
 
-        $context = SerializationContext::create()->setGroups([$group]);
-
+        $context = SerializationContext::create()->setGroups(['Default',$group]);
         $list= new PaginatedRepresentation(
-            new CollectionRepresentation($paginationObject->list),
+            null,
             'app_product_list',
-            array(),
+            [],
             $paginationObject->page,
             $paginationObject->limit,
             $paginationObject->maxPage,
         );
-        return $this->serializer->serialize($list, 'json');
+        return $this->serializer->serialize([$paginationObject->products,$list],'json',$context);
+
+
     }
 
     public function serializeList(array $productList):string
