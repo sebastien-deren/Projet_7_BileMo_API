@@ -6,6 +6,8 @@ use App\DTO\PaginationDto;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Hateoas\Representation\PaginatedRepresentation;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -47,35 +49,13 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
         $maxpage = (int)($count/$limit)+1;
+        if($page>$maxpage){
+            throw new \Exception("you tried to retrieve non-existing data",Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
+        }
         $query = $this->createQueryBuilder('paginagation')
             ->setFirstResult(($page-1)*$limit)
             ->setMaxResults($limit);
         return new PaginationDto($page,$limit,$maxpage,$query->getQuery()->getResult());
 
     }
-
-//    /**
-//     * @return Products[] Returns an array of Products objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Products
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
 }

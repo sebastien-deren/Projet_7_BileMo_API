@@ -2,50 +2,37 @@
 
 namespace App\Service;
 
+use Psr\Cache\InvalidArgumentException;
+use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-class CacheService
+Class CacheService
 {
-    public function __construct(
-        private TagAwareCacheInterface $cache,
-        private ProductService         $productService,
-        private SerializerService      $serializerService,)
+    public function __construct(private readonly TagAwareCacheInterface $cache){}
+
+    public function getCachedData(\Closure $dataToGet,string $cacheName,?string $tag =null,?array $closureParam=null):mixed{
+        return $this->cache->get($cacheName,function(ItemInterface $item)use($tag, $dataToGet,$closureParam){
+            is_string($tag) ?: $item->tag($tag);
+            $item->expiresAfter(3600);
+            return $dataToGet($closureParam);
+        });
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function destructCacheByName(?string $cacheName=null):void
     {
-
+        $this->cache->delete($cacheName);
     }
 
     /**
-     * @return string
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function getProductListCached():string{
-        $cacheName = 'productList';
-        $callback = function ($item)  {
-            $item->tag('productsList');
-            $item->expiresAfter(3600);
-            $productData = $this->productService->productList();
-            return $this->serializerService->serializeList($productData);
-        };
-         return $this->cache->get($cacheName,$callback);
-    }
-
-    /**
-     * @param int $page
-     * @param int $limit
-     * @return string
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    public function getProductPagesCached(int $page,int $limit):string{
-        $cacheName = 'productList-page' . $page . "-limit" . $limit;
-        $callback = function(ItemInterface $item) use ($limit, $page) {
-            $item->tag('productsList');
-            $item->expiresAfter(3600);
-            $paginationObject = $this->productService->productListPaginated($page, $limit);
-            return $this->serializerService->paginator('productList', $paginationObject);
-        };
-        return $this->cache->get($cacheName,$callback);
-
+    public function destructCacheByTags(?array $cacheTags= null):void
+    {
+        $this->cache->invalidateTags($cacheTags);
     }
 
 }

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\DTO\PaginationDto;
+use App\Entity\Product;
 use Hateoas\Hateoas;
 use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Representation\PaginatedRepresentation;
@@ -15,21 +16,15 @@ class SerializerService
         private readonly SerializerInterface $serializer,
     ){
     }
-    public function paginator(string $group, PaginationDto $paginationObject): string
+    /**
+     * @param string $group
+     * @param array<Product> $representation
+     * @return string
+     */
+    public function paginator(string $group,array $representation): string
     {
-
         $context = SerializationContext::create()->setGroups(['Default',$group]);
-        $list= new PaginatedRepresentation(
-            null,
-            'app_product_list',
-            [],
-            $paginationObject->page,
-            $paginationObject->limit,
-            $paginationObject->maxPage,
-        );
-        return $this->serializer->serialize([$paginationObject->products,$list],'json',$context);
-
-
+        return $this->serializer->serialize($representation,'json',$context);
     }
 
     public function serializeList(array $productList):string

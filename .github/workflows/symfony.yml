@@ -44,7 +44,7 @@ jobs:
           mkdir -p data
           touch data/database.sqlite
       - name: Migrate database
-        run: php bin/console d:m:m --no-interaction --env=test
+        run: php bin/console doctrine:schema:update --force --complete --env=test
       - name: Loading fixtures
         run: php bin/console d:f:l --no-interaction --env=test
       - name: Execute tests (Unit and Feature tests) via PHPUnit

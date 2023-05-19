@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\CacheService;
+use App\Service\Headers\PaginationHeaderInterface;
 use App\Service\ProductService;
 use App\Service\SerializerService;
 use Psr\Cache\InvalidArgumentException;
@@ -19,21 +19,18 @@ class ProductController extends AbstractController
 {
     /**
      * @throws InvalidArgumentException
+     * @throws \Exception
      */
     #[Route('products/', name: 'app_product_list', methods: 'get')]
-    public function list(Request                   $request,
-                         CacheService $cache): JsonResponse
+    public function list(Request      $request,
+                         ProductService $productService): JsonResponse
     {
 
-        $page = (int)$request->query->get('page', 0);
-        $limit = (int)$request->query->get('limit', 5);
+        $page = (int)$request->query->get('page', 1);
+        $limit = (int)$request->query->get('limit', 10);
+        //need to test if Exception is catch by our eventSubscriber (or had smthg to catch it)
 
-        if (0 === $page || $limit > 100) {
-
-            return new JsonResponse($cache->getProductListCached(), Response::HTTP_OK, [], true);
-        }
-
-        return new JsonResponse($cache->getProductPagesCached($page,$limit), Response::HTTP_OK, [], true);
+        return $productService->ProductListPaginatedJsonResponse($page,$limit);
 
     }
 }

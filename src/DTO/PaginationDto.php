@@ -14,7 +14,7 @@ class PaginationDto
         public int $page,
         public int $limit,
         public int $maxPage,
-        public array $products,
+        public array $data,
     )
     {
     }
