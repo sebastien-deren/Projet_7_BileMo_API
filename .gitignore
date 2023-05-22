@@ -19,6 +19,10 @@
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-###> docker/db ###
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
+
+###> Docker/Database ###
 /docker
-###< docker/db ###
+###< Docker/Database ###
