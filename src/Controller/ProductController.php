@@ -5,6 +5,8 @@ namespace App\Controller;
 use App\Service\Headers\PaginationHeaderInterface;
 use App\Service\ProductService;
 use App\Service\SerializerService;
+use http\Exception\BadQueryStringException;
+use PHPUnit\Util\Exception;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,8 +28,8 @@ class ProductController extends AbstractController
                          ProductService $productService): JsonResponse
     {
 
-        $page = (int)$request->query->get('page', 1);
-        $limit = (int)$request->query->get('limit', 10);
+        $page = (int)($request->query->get('page', 1));
+        $limit = (int)($request->query->get('limit', 10)) ;
         //need to test if Exception is catch by our eventSubscriber (or had smthg to catch it)
 
         return $productService->ProductListPaginatedJsonResponse($page,$limit);
