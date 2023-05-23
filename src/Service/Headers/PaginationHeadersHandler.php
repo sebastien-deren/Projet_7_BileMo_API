@@ -28,6 +28,6 @@ class PaginationHeadersHandler implements PaginationHeaderInterface
 
     private function routeGeneration(string $route, int $page, int $limit): string
     {
-        return $this->urlGenerator->generate($route, ["page" => $page, "limit" => $limit], (bool)urlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate($route, ["page" => $page, "limit" => $limit], urlGeneratorInterface::ABSOLUTE_URL);
     }
 }

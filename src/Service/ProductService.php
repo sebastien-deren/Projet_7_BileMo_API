@@ -33,13 +33,13 @@ class ProductService
      */
     public function ProductListPaginatedJsonResponse(int $page, int $limit): JsonResponse
     {
-        if ($limit < 0) {
+        if ($limit <= 0) {
             throw new \Exception("limit must be a positive integer", Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
         }
         if ($limit > 1000) {
             throw new \OutOfRangeException("You tried to request too much data", Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
         }
-        if ($page < 0) {
+        if ($page <= 0) {
             throw new \Exception("page must be a positive integer", Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
         }
 

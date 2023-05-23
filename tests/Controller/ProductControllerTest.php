@@ -64,8 +64,8 @@ class ProductControllerTest extends WebTestCase
     {
         return [
             [["page" => -1]],
-            [["page"=>0]],
-            [["page"=>'string']],
+            [["page"=>0,"limit"=>5]],
+            [["page"=>'string',"limit"=>5]],
             [["limit"=>"string"]],
             [["limit" => 0]],
             [["limit"=>-10]],

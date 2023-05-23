@@ -27,11 +27,8 @@ class ProductController extends AbstractController
     public function list(Request      $request,
                          ProductService $productService): JsonResponse
     {
-
         $page = (int)($request->query->get('page', 1));
         $limit = (int)($request->query->get('limit', 10)) ;
-        //need to test if Exception is catch by our eventSubscriber (or had smthg to catch it)
-
         return $productService->ProductListPaginatedJsonResponse($page,$limit);
 
     }
