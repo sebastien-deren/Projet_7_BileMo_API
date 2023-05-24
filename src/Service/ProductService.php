@@ -44,17 +44,18 @@ class ProductService
         }
 
         $cacheName = 'productList-page' . $page . "-limit" . $limit;
-        $dataToGet = function(array $param){
-            $productList =$this->repository->findAllWithPagination($param['page'],$param['limit']);
-            $response = new JsonResponse($this->serializerService->paginator('productList',$productList->data), Response::HTTP_OK, [], true);
-            $this->paginationHeader->setHeaders($response,$productList,'app_product_list');
+        $dataToGet = function (array $param) {
+            $productList = $this->repository->findAllWithPagination($param['page'], $param['limit']);
+            $response = new JsonResponse($this->serializerService->paginator('productList', $productList->data), Response::HTTP_OK, [], true);
+            $this->paginationHeader->setHeaders($response, $productList, 'app_product_list');
             return $response;
         };
-        return $this->cacheservice->getCachedData($dataToGet,$cacheName,'productList',['page'=>$page,'limit'=>$limit]);
-
+        return $this->cacheservice->getCachedData($dataToGet, $cacheName, 'productList', ['page' => $page, 'limit' => $limit]);
+    }
+        public function getOneById(int $id){
+        //we have our errorListener in our other branch isok
+        return $this->repository->find($id) ?? throw new RouteNotFoundException();
 
     }
-
-
 
 }
