@@ -46,7 +46,7 @@ class ProductService
         $cacheName = 'productList-page' . $page . "-limit" . $limit;
         $dataToGet = function(array $param){
             $productList =$this->repository->findAllWithPagination($param['page'],$param['limit']);
-            $response = new JsonResponse($this->serializerService->paginator('productList',$productList->data), Response::HTTP_OK, [], true);
+            $response = new JsonResponse($this->serializerService->serialize('productList',$productList->data), Response::HTTP_OK, [], true);
             $this->paginationHeader->setHeaders($response,$productList,'app_product_list');
             return $response;
         };

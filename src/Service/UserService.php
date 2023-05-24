@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\Client;
+use App\Repository\UserRepository;
+use App\Service\Headers\PaginationHeaderInterface;
 use JMS\Serializer\SerializerInterface;
 use PHPUnit\Util\Json;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,16 +14,20 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class UserService
 {
-    public function __construct(private ClientService $service,private SerializerInterface $serializer,private TagAwareCacheInterface $cache){}
-    public function PaginatedListUserJson(Client $client,int $page, int $limit):JsonResponse{
+    public function __construct(private UserRepository $repository,private SerializerInterface $serializer,private CacheService $cacheService, private PaginationHeaderInterface $paginationHeader){}
+    public function PaginatedListUserJson(Client $client,int $page, int $limit):JsonResponse
+    {
 
+        $cacheName = 'UserList-Client' . $client->getUserIdentifier() . '-page' . $page . "-limit";
+        $dataToGet = function (array $param)  {
+            $userList = $this->repository->getPaginateUsers($param['client'],$param['page'],$param['limit']);;
+            $response = new JsonResponse($this->serializer->serialize( $userList->data,"userList"), Response::HTTP_OK, [], true);
+            $this->paginationHeader->setHeaders($response, $userList, 'app_user_list');
+            return $response;
+        };
+        return $this->cacheService->getCachedData($dataToGet, $cacheName, 'userList', ['client'=> $client, 'page'=> $page, 'limit'=> $limit]);
 
-       return $this->cache->get('UserList-Client'.$client->getUserIdentifier().'-page'.$page."-limit".$limit,function(ItemInterface $item) use ($client,$page,$limit){
-            $item->tag('client'.$client->getUserIdentifier());
-            $item->expiresAfter(3600);
-            $usersPaginated = $this->service->getPaginateUsers($client,$page,$limit);
-            return new JsonResponse($this->serializer->serialize($usersPaginated[0],'UserList'),Response::HTTP_OK,[],'json');
-        });
     }
+
 
 }
