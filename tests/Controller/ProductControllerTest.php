@@ -2,19 +2,23 @@
 
 namespace App\Tests\Controller;
 
+use App\Controller\ProductController;
 use App\Entity\Client;
+use App\Entity\Product;
 use App\Repository\ClientRepository;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
+use App\Repository\ProductsRepository;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProductControllerTest extends WebTestCase
 {
     private KernelBrowser|null $client;
     private UrlGeneratorInterface $urlGenerator;
-
+    private Product|null $testProduct;
     private Client|null $testUser;
 
     public function setUp(): void
