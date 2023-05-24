@@ -30,18 +30,13 @@ class ProductController extends AbstractController
 
 
     }
+    #[Cache(maxage: 3600,public: false,mustRevalidate: true)]
     #[Route('/products/{id<\d+>}', name: 'app_product_details')]
     public function productDetails(
         int $id,
         SerializerService $serializer,
         ProductService $productService): JsonResponse
     {
-        $response = new JsonResponse();
-        $serializedData = $serializer->serializeOnce($productService->getOneById($id),'details');
-        return $response->setJson($serializedData)->setStatusCode(Response::HTTP_OK)->setCache([
-            'public'=>true,
-            'etag'=>"product".$id,
-            'max_age'=>3600,
-        ]);;
+        return  $productService->productDetailJsonResponse($id);
     }
 }

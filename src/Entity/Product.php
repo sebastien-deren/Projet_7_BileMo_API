@@ -7,9 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Annotation\Groups;
 use Hateoas\Configuration\Annotation as Hateoas;
-use Hateoas\Configuration\Annotation as Hateoas;
-use JMS\Serializer\Annotation as Serializer;
-use JMS\Serializer\Annotation\Groups;
 
 /**
  * @Serializer\XmlRoot("product")
@@ -17,12 +14,12 @@ use JMS\Serializer\Annotation\Groups;
  * @Hateoas\Relation(
  *     "self",
  *     href= "expr('api/products/' ~ object.getId())",
- *     exclusion = @Hateoas\Exclusion(groups="details"))
+ *     exclusion = @Hateoas\Exclusion(groups="productDetails"))
  *
  * @Hateoas\Relation(
  *     "list",
  *     href="api/products",
- *     exclusion= @Hateoas\Exclusion(groups="details"))
+ *     exclusion= @Hateoas\Exclusion(groups="productList"))
  */
 #[ORM\Entity(repositoryClass: ProductsRepository::class)]
 class Product
@@ -30,36 +27,36 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['list','details'])]
+    #[Groups(['productList','productDetails'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['list','details'])]
+    #[Groups(['productList','productDetails'])]
     private ?string $name = null;
 
-    #[Groups(['list','details'])]
+    #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $brand = null;
 
-    #[Groups(['list','details'])]
+    #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $operatingSystem = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['details'])]
+    #[Groups(['productDetails'])]
 
     private ?int $screensize = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['details'])]
+    #[Groups(['productDetails'])]
     private ?int $numberOfPhoto = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['details'])]
+    #[Groups(['productDetails'])]
     private ?string $resolution = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['details'])]
+    #[Groups(['productDetails'])]
     private ?int $photoResolution = null;
 
     public function getId(): ?int

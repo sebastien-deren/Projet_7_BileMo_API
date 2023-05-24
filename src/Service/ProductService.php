@@ -22,11 +22,16 @@ class ProductService
     {
     }
 
-    public function productList(): array
+    public function productDetailJsonResponse(int $id):JsonResponse
     {
-        return $this->repository->findAll();
-    }
 
+        $cacheName = 'product'.$id;
+        $dataToGet= function (array $param){
+            $product = $this->repository->find($param['id']);
+            return new JsonResponse($this->serializerService->serialize($product,"productDetail"));
+        };
+        return $this->cacheservice->getCachedData($dataToGet,$cacheName,'product'.$id,['id'=>$id]);
+    }
     /**
      * @throws InvalidArgumentException
      * @throws \Exception
@@ -46,16 +51,11 @@ class ProductService
         $cacheName = 'productList-page' . $page . "-limit" . $limit;
         $dataToGet = function (array $param) {
             $productList = $this->repository->findAllWithPagination($param['page'], $param['limit']);
-            $response = new JsonResponse($this->serializerService->paginator('productList', $productList->data), Response::HTTP_OK, [], true);
+            $response = new JsonResponse($this->serializerService->serialize($productList->data,'productList'), Response::HTTP_OK, [], true);
             $this->paginationHeader->setHeaders($response, $productList, 'app_product_list');
             return $response;
         };
         return $this->cacheservice->getCachedData($dataToGet, $cacheName, 'productList', ['page' => $page, 'limit' => $limit]);
-    }
-        public function getOneById(int $id){
-        //we have our errorListener in our other branch isok
-        return $this->repository->find($id) ?? throw new RouteNotFoundException();
-
     }
 
 }
