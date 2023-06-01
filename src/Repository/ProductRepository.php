@@ -44,6 +44,9 @@ class ProductRepository extends ServiceEntityRepository
     }
     public function findAllWithPagination(int $page = 1 , int $limit =5):PaginationDto
     {
+        if($limit <= 0 ){
+            throw new \Exception("limit must be a positive integer");
+        }
         $count = $this->createQueryBuilder('a')
             ->select('count(a.id)' )
             ->getQuery()

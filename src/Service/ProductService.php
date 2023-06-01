@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\DTO\PaginationDto;
 use App\Repository\ProductRepository;
 use App\Service\CacheService;
 use App\Service\Headers\PaginationHeaderInterface;
@@ -15,8 +16,6 @@ class ProductService
 {
     public function __construct(
         private readonly ProductRepository $repository,
-        private SerializerService          $serializerService,
-        private  PaginationHeaderInterface $paginationHeader,
         private CacheService $cacheservice,
     )
     {
@@ -31,7 +30,7 @@ class ProductService
      * @throws InvalidArgumentException
      * @throws \Exception
      */
-    public function ProductListPaginatedJsonResponse(int $page, int $limit): JsonResponse
+    public function ProductListPaginatedJsonResponse(int $page, int $limit): PaginationDto
     {
         if ($limit <= 0) {
             throw new \Exception("limit must be a positive integer", Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -43,16 +42,16 @@ class ProductService
             throw new \Exception("page must be a positive integer", Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
         }
 
-        $cacheName = 'productList-page' . $page . "-limit" . $limit;
+        $cacheName = $this->cacheNamePage($page,$limit);
         $dataToGet = function(array $param){
-            $productList =$this->repository->findAllWithPagination($param['page'],$param['limit']);
-            $response = new JsonResponse($this->serializerService->paginator('productList',$productList->data), Response::HTTP_OK, [], true);
-            $this->paginationHeader->setHeaders($response,$productList,'app_product_list');
-            return $response;
+            return $this->repository->findAllWithPagination($param['page'],$param['limit']);
         };
         return $this->cacheservice->getCachedData($dataToGet,$cacheName,'productList',['page'=>$page,'limit'=>$limit]);
 
 
+    }
+    public function cacheNamePage($page,$limit):string{
+        return 'productList-page' . $page . "-limit" . $limit;
     }
 
 

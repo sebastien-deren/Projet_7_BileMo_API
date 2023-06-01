@@ -24,14 +24,19 @@ class ProductController extends AbstractController
      * @throws InvalidArgumentException
      * @throws \Exception
      */
-    #[Cache(maxage:3600,public:false,mustrevalidate:true)]
-    #[Route('products/', name: 'app_product_list', methods: 'get')]
-    public function list(Request      $request,
-                         ProductService $productService): JsonResponse
+    #[Cache(maxage: 3600, public: false, mustrevalidate: true)]
+    #[Route('products', name: 'app_product_list', methods: 'get')]
+    public function list(Request           $request,
+                         ProductService    $productService,
+                         SerializerService $serializerService,
+                         PaginationHeaderInterface $paginationHeader): JsonResponse
     {
         $page = (int)($request->query->get('page', 1));
-        $limit = (int)($request->query->get('limit', 10)) ;
-        return $productService->ProductListPaginatedJsonResponse($page,$limit);
+        $limit = (int)($request->query->get('limit', 10));
+        $productList = $productService->ProductListPaginatedJsonResponse($page, $limit);
+        $response = new JsonResponse($serializerService->paginator('productList', $productList->data), Response::HTTP_OK, [], true);
+        $paginationHeader->setHeaders($response, $productList, 'app_product_list');
+        return $response;
 
     }
 }
