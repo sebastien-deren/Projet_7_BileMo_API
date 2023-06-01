@@ -6,7 +6,6 @@ use App\DTO\PaginationDto;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Hateoas\Representation\PaginatedRepresentation;
 use Symfony\Component\HttpFoundation\Response;
 
 /**

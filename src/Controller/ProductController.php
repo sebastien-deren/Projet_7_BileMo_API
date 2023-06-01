@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 #[Route('/api/')]
 class ProductController extends AbstractController
 {
@@ -31,9 +30,19 @@ class ProductController extends AbstractController
         $page = (int)($request->query->get('page', 1));
         $limit = (int)($request->query->get('limit', 10));
         $productList = $productService->ProductListPaginatedJsonResponse($page, $limit);
-        $response = new JsonResponse($serializerService->paginator('productList', $productList->data), Response::HTTP_OK, [], true);
+        $response = new JsonResponse($serializerService->serialize('productList', $productList->data), Response::HTTP_OK, [], true);
         $paginationHeader->setHeaders($response, $productList, 'app_product_list');
         return $response;
+    }
+    #[Cache(maxage: 3600,public: false,mustRevalidate: true)]
+    #[Route('products/{id<\d+>}', name: 'app_product_details',methods: 'get')]
+    public function productDetails(
+        int $id,
+        SerializerService $serializer,
+        ProductService $productService): JsonResponse
+    {
+        $product = $productService->productDetail($id);
+        return new JsonResponse($serializer->serialize('productDetails',$product),Response::HTTP_OK,[],true);
 
     }
 }
