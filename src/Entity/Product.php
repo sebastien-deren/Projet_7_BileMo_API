@@ -2,36 +2,64 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductsRepository;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Groups;
 
+
+/**
+ * @Serializer\XmlRoot("product")
+ *
+ *
+ *
+ * @Hateoas\Relation(
+ *     "self",
+ *     href= "expr('api/products/' ~ object.getId())",
+ *     exclusion = @Hateoas\Exclusion(groups="productDetails"))
+ *
+ * @Hateoas\Relation(
+ *     "list",
+ *     href="api/products",
+ *     exclusion= @Hateoas\Exclusion(groups="productList"))
+ */
 #[ORM\Entity(repositoryClass: ProductsRepository::class)]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['productList','productDetails'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productList','productDetails'])]
     private ?string $name = null;
 
+    #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $brand = null;
 
+    #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $operatingSystem = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productDetails'])]
+
     private ?int $screensize = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productDetails'])]
     private ?int $numberOfPhoto = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productDetails'])]
     private ?string $resolution = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productDetails'])]
     private ?int $photoResolution = null;
 
     public function getId(): ?int
@@ -75,14 +103,14 @@ class Product
         return $this;
     }
 
-    public function getScreensize(): ?int
+    public function getScreenSize(): ?int
     {
         return $this->screensize;
     }
 
-    public function setScreensize(?int $screensize): self
+    public function setScreenSize(?int $screenSize): self
     {
-        $this->screensize = $screensize;
+        $this->screensize = $screenSize;
 
         return $this;
     }
