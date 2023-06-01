@@ -2,36 +2,55 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductsRepository;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: ProductsRepository::class)]
+
+/**
+ * @Serializer\XmlRoot("product")
+ *
+ *
+ * @Hateoas\Relation("list", href=@Hateoas\Route("app_product_list",absolute=true))
+ * @Hateoas\Relation("self", href="expr('api/products/' ~ object.getId())")
+ */
+#[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['productList'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productList'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productList'])]
     private ?string $brand = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['productsDetail'])]
     private ?string $operatingSystem = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?int $screensize = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?int $numberOfPhoto = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?string $resolution = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['productsDetail'])]
     private ?int $photoResolution = null;
 
     public function getId(): ?int
