@@ -2,13 +2,10 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\ProductController;
 use App\Entity\Client;
 use App\Entity\Product;
 use App\Repository\ClientRepository;
 use App\Repository\ProductRepository;
-use App\Repository\ProductsRepository;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;

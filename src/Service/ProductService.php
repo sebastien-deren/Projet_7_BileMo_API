@@ -5,14 +5,8 @@ namespace App\Service;
 use App\DTO\PaginationDto;
 use App\Entity\Product;
 use App\Repository\ProductRepository;
-use App\Service\CacheService;
-use App\Service\Headers\PaginationHeaderInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
-
 class ProductService
 {
     public function __construct(

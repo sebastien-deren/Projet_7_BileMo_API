@@ -35,7 +35,7 @@ class ProductController extends AbstractController
         return $response;
     }
     #[Cache(maxage: 3600,public: false,mustRevalidate: true)]
-    #[Route('/products/{id<\d+>}', name: 'app_product_details')]
+    #[Route('products/{id<\d+>}', name: 'app_product_details',methods: 'get')]
     public function productDetails(
         int $id,
         SerializerService $serializer,
