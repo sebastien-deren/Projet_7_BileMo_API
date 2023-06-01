@@ -3,7 +3,6 @@
 namespace App\Service\Headers;
 
 use App\DTO\PaginationDto;
-use Hateoas\Representation\PaginatedRepresentation;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 

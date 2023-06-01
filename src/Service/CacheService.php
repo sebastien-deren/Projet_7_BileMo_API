@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use Psr\Cache\InvalidArgumentException;
-use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 

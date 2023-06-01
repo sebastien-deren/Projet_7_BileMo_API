@@ -3,9 +3,7 @@
 namespace App\Service\Headers;
 
 
-
 use App\DTO\PaginationDto;
-use Hateoas\Representation\PaginatedRepresentation;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 interface PaginationHeaderInterface
