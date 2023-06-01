@@ -39,12 +39,10 @@ class Product
 
     #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
-    #[Groups(['productList'])]
     private ?string $brand = null;
 
     #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
-    #[Groups(['productsDetail'])]
     private ?string $operatingSystem = null;
 
     #[ORM\Column(nullable: true)]

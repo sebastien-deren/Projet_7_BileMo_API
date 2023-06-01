@@ -30,7 +30,7 @@ class ProductController extends AbstractController
         $page = (int)($request->query->get('page', 1));
         $limit = (int)($request->query->get('limit', 10));
         $productList = $productService->ProductListPaginatedJsonResponse($page, $limit);
-        $response = new JsonResponse($serializerService->paginator('productList', $productList->data), Response::HTTP_OK, [], true);
+        $response = new JsonResponse($serializerService->serialize('productList', $productList->data), Response::HTTP_OK, [], true);
         $paginationHeader->setHeaders($response, $productList, 'app_product_list');
         return $response;
     }
@@ -41,6 +41,8 @@ class ProductController extends AbstractController
         SerializerService $serializer,
         ProductService $productService): JsonResponse
     {
-        return  $productService->productDetailJsonResponse($id);
+        $product = $productService->productDetail($id);
+        return new JsonResponse($serializer->serialize('productDetails',$product),Response::HTTP_OK,[],true);
+
     }
 }
