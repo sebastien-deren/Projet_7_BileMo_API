@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Service;
 
@@ -12,14 +12,24 @@ use JMS\Serializer\SerializerInterface;
 
 class SerializerService
 {
-    public function __construct(private readonly SerializerInterface $serializer)
-    {
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+    ){
     }
-
-    public function serialize(mixed $data , string $group) :string
+    /**
+     * @param string $group
+     * @param array<Product> $representation
+     * @return string
+     */
+    public function paginator(string $group,array $representation): string
     {
         $context = SerializationContext::create()->setGroups(['Default',$group]);
-        return $this->serializer->serialize($data,'json',$context);
+        return $this->serializer->serialize($representation,'json',$context);
+    }
+
+    public function serializeList(array $productList):string
+    {
+        return $this->serializer->serialize($productList,'json');
     }
 
 

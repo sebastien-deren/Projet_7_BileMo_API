@@ -12,12 +12,19 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Entity\Client;
+use App\Repository\ClientRepository;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProductControllerTest extends WebTestCase
 {
     private KernelBrowser|null $client;
     private UrlGeneratorInterface $urlGenerator;
+
     private Product|null $testProduct;
     private Client|null $testUser;
 

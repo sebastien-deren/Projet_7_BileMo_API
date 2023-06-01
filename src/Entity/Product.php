@@ -4,12 +4,15 @@ namespace App\Entity;
 
 use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Annotation\Groups;
-use Hateoas\Configuration\Annotation as Hateoas;
+
 
 /**
  * @Serializer\XmlRoot("product")
+ *
+ *
  *
  * @Hateoas\Relation(
  *     "self",
@@ -36,10 +39,12 @@ class Product
 
     #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
+    #[Groups(['productList'])]
     private ?string $brand = null;
 
     #[Groups(['productList','productDetails'])]
     #[ORM\Column(length: 255)]
+    #[Groups(['productsDetail'])]
     private ?string $operatingSystem = null;
 
     #[ORM\Column(nullable: true)]
