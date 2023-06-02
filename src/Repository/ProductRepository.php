@@ -1,10 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\DTO\PaginationDto;
 use App\Entity\Product;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @extends ServiceEntityRepository<Product>
@@ -14,10 +16,11 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Product[]    findAll()
  * @method Product[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class ProductsRepository extends ServiceEntityRepository
+class ProductRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
+
         parent::__construct($registry, Product::class);
     }
 
@@ -38,29 +41,23 @@ class ProductsRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    public function findAllWithPagination(int $page = 1 , int $limit =5):PaginationDto
+    {
+        if($limit <= 0 ){
+            throw new \Exception("limit must be a positive integer");
+        }
+        $count = $this->createQueryBuilder('a')
+            ->select('count(a.id)' )
+            ->getQuery()
+            ->getSingleScalarResult();
+        $maxpage = (int)($count/$limit)+1;
+        if($page>$maxpage){
+            throw new \Exception("you tried to retrieve non-existing data",Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
+        }
+        $query = $this->createQueryBuilder('paginagation')
+            ->setFirstResult(($page-1)*$limit)
+            ->setMaxResults($limit);
+        return new PaginationDto($page,$limit,$maxpage,$query->getQuery()->getResult());
 
-//    /**
-//     * @return Products[] Returns an array of Products objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Products
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    }
 }
