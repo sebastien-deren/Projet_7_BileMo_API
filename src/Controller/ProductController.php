@@ -36,7 +36,6 @@ class ProductController extends AbstractController
 
     )]
     #[Security(name: 'BearerAuth')]
-    #[OA\SecurityScheme(type: 'http', name: 'BearerAuth', bearerFormat: 'JWT', scheme: 'bearer')]
     public function list(Request                   $request,
                          ProductService            $productService,
                          SerializerService         $serializerService,
@@ -58,7 +57,6 @@ class ProductController extends AbstractController
         content: new Model(type: Product::class,groups: ['product_detail'])
 
     )]
-    #[OA\SecurityScheme(type: 'http', name: 'BearerAuth', bearerFormat: 'JWT', scheme: 'bearer')]
     #[Route('products/{id<\d+>}', name: 'app_product_details', methods: 'get')]
     public function productDetails(
         int               $id,
