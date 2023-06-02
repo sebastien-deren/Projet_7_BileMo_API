@@ -1,18 +1,27 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Service;
 
-use JMS\Serializer\Context;
+use App\Entity\Product;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 
-class serializerService
+class SerializerService
 {
-
-    public function __construct(private SerializerInterface $serializer){}
-    public function serialize(mixed $data,string $group){
-        $context = SerializationContext::create();
-        $context->setGroups(['Default',$group]);
+    public function __construct(
+        private readonly SerializerInterface $serializer,
+    ){
+    }
+    /**
+     * @param string $group
+     * @param array<Product> $representation
+     * @return string
+     */
+    public function serialize(string $group,mixed $data):string
+    {
+        $context = SerializationContext::create()->setGroups(['Default',$group]);
         return $this->serializer->serialize($data,'json',$context);
     }
+
+
 }

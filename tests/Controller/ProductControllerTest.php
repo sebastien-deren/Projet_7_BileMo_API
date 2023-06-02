@@ -3,11 +3,13 @@
 namespace App\Tests\Controller;
 
 use App\Entity\Client;
+use App\Entity\Product;
 use App\Repository\ClientRepository;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
+use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ProductControllerTest extends WebTestCase
@@ -15,6 +17,7 @@ class ProductControllerTest extends WebTestCase
     private KernelBrowser|null $client;
     private UrlGeneratorInterface $urlGenerator;
 
+    private Product|null $testProduct;
     private Client|null $testUser;
 
     public function setUp(): void
@@ -22,6 +25,8 @@ class ProductControllerTest extends WebTestCase
         $this->client = static::createClient();
         $userRepository = static::getContainer()->get(ClientRepository::class);
         $this->testUser = $userRepository->findOneBy(["username" => 'green']);
+        $productRepository = static::getContainer()->get(ProductRepository::class);
+        $this->testProduct = $productRepository->findOneBy(["brand"=>"LG"]);
         $this->urlGenerator = $this->client->getContainer()->get('router.default');
     }
 
@@ -39,6 +44,19 @@ class ProductControllerTest extends WebTestCase
         $responseData = json_decode($responseDataJson, true);
         $this->assertTrue(is_array($responseData));
         $this->assertTrue(count($responseData) === $limit);
+    }
+    public function testProductDetailReturnGoodJson()
+    {
+        $this->client->loginUser($this->testUser);
+        $this->client->request(Request::METHOD_GET, $this->urlGenerator->generate('app_product_details', ['id'=>$this->testProduct->getId()]));
+        $response = $this->client->getResponse();
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertTrue($response->headers->contains('Content-Type', 'application/json'));
+        $this->assertJson($response->getContent());
+        $responseDataJson = $response->getContent();
+        $this->assertJson($responseDataJson);
+        $responseData = json_decode($responseDataJson, true);
+        $this->assertTrue(is_array($responseData));
     }
     public function testProductListNotLogged()
     {
