@@ -22,6 +22,10 @@ class SerializerService
         $context = SerializationContext::create()->setGroups(['Default',$group]);
         return $this->serializer->serialize($data,'json',$context);
     }
+    public function deserialize(string $data,string $type,string $format):mixed
+    {
+        return $this->serializer->deserialize($data,$type,$format);
+    }
 
 
 }
