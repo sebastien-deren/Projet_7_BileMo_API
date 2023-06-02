@@ -12,6 +12,8 @@
         "doctrine/orm": "^2.15",
         "jms/serializer-bundle": "^5.2",
         "lexik/jwt-authentication-bundle": "^2.19",
+        "nelmio/api-doc-bundle": "^4.11",
+        "symfony/asset": "6.2.*",
         "symfony/cache": "6.2.*",
         "symfony/config": "6.2.*",
         "symfony/console": "6.2.*",
@@ -22,9 +24,11 @@
         "symfony/runtime": "6.2.*",
         "symfony/security-bundle": "6.2.*",
         "symfony/serializer": "6.2.*",
+        "symfony/twig-bundle": "6.2.*",
         "symfony/yaml": "6.2.*",
         "willdurand/hateoas": "^3.9",
-        "willdurand/hateoas-bundle": "^2.5"
+        "willdurand/hateoas-bundle": "^2.5",
+        "zircote/swagger-php": "^4.7"
     },
     "config": {
         "allow-plugins": {
