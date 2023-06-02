@@ -6,6 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -16,30 +17,39 @@ class User
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255)]
     private ?string $phoneNumber = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $street = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $streetNumber = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $zipCode = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $city = null;
 
+    #[Groups(['userDetail'])]
     #[ORM\ManyToMany(targetEntity: Client::class, inversedBy: 'users')]
     private Collection $clients;
 

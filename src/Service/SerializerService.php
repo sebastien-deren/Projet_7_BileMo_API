@@ -12,9 +12,10 @@ class SerializerService
         private readonly SerializerInterface $serializer,
     ){
     }
+
     /**
      * @param string $group
-     * @param array<Product> $representation
+     * @param mixed $data
      * @return string
      */
     public function serialize(string $group,mixed $data):string
