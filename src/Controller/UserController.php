@@ -20,8 +20,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
 
-    #[Cache(maxage: 60, public: false, mustRevalidate: true)]
-    #[Route('/api/clients/{username}/users', name: 'app_user_list', requirements: ['id' => '\d+'], methods: 'get')]
+    //#[Cache(maxage: 60, public: false, mustRevalidate: true)]
+    #[Route('/api/clients/{username}/users', name: 'app_user_list', methods: 'get')]
     public function list(
         Client                    $client,
         UserService               $userService,
@@ -34,7 +34,7 @@ class UserController extends AbstractController
         }
         $page = (int)$request->query->get('page', 1);
         $limit = (int)$request->query->get('limit', 10);
-        $paginatedUser = $userService->PaginatedListUserJson($client, $page, $limit);
+        $paginatedUser = $userService->PaginatedListUser($client, $page, $limit);
         $response = new JsonResponse($serializerService->serialize('userList', $paginatedUser->data), Response::HTTP_OK, [], true);
         $paginationHeader->setHeaders($response, $paginatedUser, 'app_user_list',["username"=> $client->getUsername()]);
         return $response;

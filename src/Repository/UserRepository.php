@@ -6,6 +6,7 @@ use App\DTO\PaginationDto;
 use App\Entity\Client;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -52,13 +53,27 @@ class UserRepository extends ServiceEntityRepository
             throw new \Exception("page must be a positive integer", Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
         }
         $users= $client->getUsers();
-        if(($page*$limit)>$users->count()){
-            throw new \OutOfRangeException("the data you requested does not exist",Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
-        }
         $data = $users->slice(($page-1)*$limit,$limit);
-        $maxPage= (int) $users->count()/$limit;
+        $this->setCurrentClient($data, $client);
+        $maxPage=  (int)ceil($users->count()/$limit);
+        if($page > $maxPage){
+            throw new \OutOfRangeException("You tried to request too much data", Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
+        }
         return new PaginationDto($page,$limit,$maxPage,$data);
 
+    }
+
+    /***
+     * @param Array<User> $data
+     * @param Client $client
+     * @return void
+     */
+    private function setCurrentClient(Array $data,Client $client): void
+    {
+        foreach ($data as $user)
+        {
+            $user->setClientName($client->getUsername());
+        }
     }
 
 //    /**

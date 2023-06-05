@@ -2,24 +2,29 @@
 
 namespace App\Entity;
 
+use App\Listener\UserListener;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 //Problem with expressions trying to retrieve Username but couldn't find how
+
 /**
  * @Serializer\XmlRoot("product")
  *
  * @Hateoas\Relation(
  *     "self",
- *     href= "expr('api/clients/' ~ object.getClients() ~ '/users/' ~ object.getId() )",
- *      exclusion= @Hateoas\Exclusion(groups="userDetails"))
+ *     href= "expr('api/users/' ~ object.getId() )",
+ *      exclusion= @Hateoas\Exclusion(groups="userList"))
  * @Hateoas\Relation(
  *     "list",
- *     href= "expr('api/clients/' ~ object.getId() ~ '/users/')",
+ *     href= "expr('api/clients/' ~ object.getClientName() ~ '/users/')",
  *     exclusion= @Hateoas\Exclusion(groups="userList"))
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -67,6 +72,26 @@ class User
     #[ORM\ManyToMany(targetEntity: Client::class, inversedBy: 'users')]
     private Collection $clients;
 
+    #[Serializer\Groups(['none'])]
+    private ?string $clientName = null;
+
+    /**
+     * @return string
+     */
+    public function getClientName(): string|int
+    {
+//here i need to find a way to get my client
+        if (null == $this->clientName) {
+            return $this->id;
+        }
+        return $this->clientName;
+    }
+    public function setClientName(string $name)
+    {
+        $this->clientName = $name;
+        return $this;
+
+    }
     public function __construct()
     {
         $this->clients = new ArrayCollection();
