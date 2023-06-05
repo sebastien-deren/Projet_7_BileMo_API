@@ -20,6 +20,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
 
+    #[Cache(maxage: 60, public: false, mustRevalidate: true)]
     #[Route('/api/clients/{username}/users', name: 'app_user_list', requirements: ['id' => '\d+'], methods: 'get')]
     public function list(
         Client                    $client,
