@@ -19,6 +19,7 @@ class UserController extends AbstractController
     public function detail(
         int           $id,
         int           $clientId,
+        SerializerService $serializerService,
         UserService   $service,
         ClientService $clientService
     ): JsonResponse
@@ -26,7 +27,6 @@ class UserController extends AbstractController
 
         $client = $clientService->getValidClient($this->getUser(), $clientId);
         $user = $service->getValidUser($id, $client);
-        $jsonRepsonse = $service->detailJsonResponse($user);
-        return $jsonRepsonse;
+        return new JsonResponse($serializerService->serialize('userList',$user),Response::HTTP_OK,[],true);
     }
 }

@@ -18,31 +18,42 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class UserService
 {
-    public function __construct(private UserRepository $repository,private TagAwareCacheInterface $cache, private serializerService $serializerService)
-    {}
-    public function findOneValid(int $id,int $clientId)
+    public function __construct(
+        private UserRepository    $repository,
+        private CacheService      $cacheService,
+        private serializerService $serializerService
+    )
+    {
+    }
+
+    public function findOneValid(int $id, int $clientId)
     {
         return $this->repository->find($id) ?? throw new RouteNotFoundException();
     }
-    public function getValidUser(int $id, Client $client):User
-    {
-        $user = $this->repository->find($id)?? throw new RouteNotFoundException();
-        $clients = $user->getClients();
-        $isClient = $clients->exists(function($key,$value)use ($client){
-            return  $value ===  $client;
-        });
-        return $isClient ? $user : throw new AccessDeniedException("you don't have the right to access this client",Response::HTTP_FORBIDDEN);
 
+    public function getValidUser(int $id, Client $client): User
+    {
+        $dataToGet = function ($param) {
+            $user = $this->repository->find($param['id']) ?? throw new RouteNotFoundException();
+            return $user->getClients()->contains($param['client']) ?
+                $user :
+                throw new AccessDeniedException(
+                    "you don't have the right to access this client",
+                    Response::HTTP_FORBIDDEN
+                );
+        };
+
+        return $this->cacheService->getCachedData(
+            $dataToGet,
+            $this->cacheNameDetail($id),
+            'userDetail' . $id,
+            ['id' => $id, 'client' => $client]);
 
     }
-    public function detailJsonResponse(User $user):JsonResponse
-    {
-        return $this->cache->get('userDetail-'.$user->getId(),
-        function(ItemInterface $item) use ($user){
-            $item->tag($user->getId());
-            $item->expiresAfter(3600);
-            return new JsonResponse($this->serializerService->serialize($user,'UserDetail'),Response::HTTP_OK,[],true);
-        });
+        public function cacheNameDetail($userId)
+        {
+            return 'userDetails'.$userId;
+        }
 
-    }
+
 }
