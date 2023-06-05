@@ -12,7 +12,7 @@ use Doctrine\ORM\Event\PostRemoveEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
-use Doctrine\ORM\Mapping as ON;
+use Doctrine\ORM\Mapping as On;
 
 class UserListener
 {
@@ -22,7 +22,7 @@ class UserListener
     {
     }
 
-    #[ON\PreUpdate]
+    #[On\PreUpdate]
     public function clearUpdatedCache(User $user, PreUpdateEventArgs $eventArgs)
     {
         if ($eventArgs->hasChangedField('Client')) {
@@ -30,6 +30,7 @@ class UserListener
             $newClients = $eventArgs->getNewValue('Client');
             $client = $this->findChangedClient($oldClients, $newClients);
             $this->cacheService->destructCacheByTags(['userList' . $client->getId()]);
+            $this->cacheService->destructCacheByName(($this->userService->cacheNameUserDetail($user->getId(), $client->getId())));
         }
         //other changes to users that need cache Clearing can go there
 
@@ -58,13 +59,13 @@ class UserListener
 
 }
 
-    #[ON\PreRemove]
+    #[On\PreRemove]
     public function clearCacheDeletedUser(PreRemoveEventArgs $eventArgs)
 {
     $entity = $eventArgs->getObject();
     $client = $entity->getClients()->first();
     $this->cacheService->destructCacheByTags(['userList' . $client->getId()]);
-    $this->cacheService->destructCacheByName(($this->userService->cacheNameUserDetail($entity->getId, $client->getId())));
+    $this->cacheService->destructCacheByName(($this->userService->cacheNameUserDetail($entity->getId(), $client->getId())));
 }
 
 }
