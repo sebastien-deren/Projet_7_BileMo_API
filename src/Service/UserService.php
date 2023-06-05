@@ -13,14 +13,15 @@ class UserService
     ){}
     public function delete(User $user,Client $client):User|false
     {
-        if(!$client->getUsers()->contains($user)){
+        if (!$client->getUsers()->contains($user)) {
             return false;
         }
-        $client->removeUser($user);
-        if(0 === $user->getClients()->count() )
-        {
-            $this->userRepository->remove($user,true);
+        if (1 === $user->getClients()->count()) {
+            $this->userRepository->remove($user, true);
+            return $user;
         }
+        $user->removeClient($client);
+        $this->userRepository->save($user, true);
         return $user;
     }
 
