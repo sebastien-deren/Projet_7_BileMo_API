@@ -8,6 +8,7 @@ use App\Service\ProductService;
 use App\Service\SerializerService;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
+use phpDocumentor\Reflection\Types\String_;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,21 +22,36 @@ use OpenApi\Attributes as OA;
 class ProductController extends AbstractController
 {
     /**
+     * Get a List of product paginated by page and limit
+     *
      * @throws InvalidArgumentException
      * @throws \Exception
      */
     #[Cache(maxage: 3600, public: false, mustRevalidate: true)]
+
     #[Route('products', name: 'app_product_list', methods: 'get')]
     #[OA\Response(
         response: 200,
-        description: 'return a paginated list of Product',
+        description: 'return a paginated list of Product Summarized',
         content: new Oa\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Product::class, groups: ['product_List']))
+            items: new OA\Items(ref: new Model(type: Product::class, groups: ['productList']))
         )
-
     )]
-    #[Security(name: 'BearerAuth')]
+    #[OA\Parameter(
+        name: 'page',
+        description: 'The page you want to see',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Parameter(
+        name: 'limit',
+        description: 'the number of item you want to see by page (limited to 100)',
+        in: 'query',
+        schema: new OA\Schema(type: 'string')
+    )]
+    #[OA\Tag(name: 'Product')]
+    #[Security(name: 'Bearer')]
     public function list(Request                   $request,
                          ProductService            $productService,
                          SerializerService         $serializerService,
@@ -49,14 +65,24 @@ class ProductController extends AbstractController
         return $response;
     }
 
+
+    /**
+     * Get a Product Details
+     *
+     * @param int $id
+     * @param SerializerService $serializer
+     * @param ProductService $productService
+     * @return JsonResponse
+     */
     #[Cache(maxage: 3600, public: false, mustRevalidate: true)]
-    #[Security(name: 'BearerAuth')]
     #[OA\Response(
         response: 200,
         description: 'return a paginated list of Product',
-        content: new Model(type: Product::class,groups: ['product_detail'])
+        content: new Model(type: Product::class,groups: ['productDetails'])
 
     )]
+    #[OA\Tag(name: 'Product')]
+
     #[Route('products/{id<\d+>}', name: 'app_product_details', methods: 'get')]
     public function productDetails(
         int               $id,

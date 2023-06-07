@@ -1,8 +1,8 @@
 nelmio_api_doc:
     documentation:
         info:
-            title: My App
-            description: This is an awesome app!
+            title: BileMo
+            description: your favorite B2B mobile api
             version: 1.0.0
         components:
             securitySchemes:
@@ -10,9 +10,49 @@ nelmio_api_doc:
                     type: http
                     scheme: bearer
                     bearerFormat: JWT
+            schemas:
+                Login:
+                    type: object
+                    properties:
+                        username:
+                            type: string
+                            description: the username you use to connect
+                        password:
+                            type: string
+                            description: you know what a password is right ?
         security:
             - Bearer: [ ]
+        paths:
+            /api/login_check:
+                post:
+                    tags:
+                        - Login
+                    summary: Get the Bearer Token
+                    description: >
+                        Use this link to authenticate yourself to the database and test the paths
+                        You'll need your **username** and your **password**.
+                    operationId: LoginClient
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    ref: '#components/schemas/Login'
+
+                    responses:
+                        '200':
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        properties:
+                                            token:
+                                                type: string
 
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
+    models:
+        names:
+            - { alias: Product,        type: App\Entity\Product, groups: [productDetails] }
+            - { alias: Product Summary, type: App\Entity\Product, groups:[productList]}
