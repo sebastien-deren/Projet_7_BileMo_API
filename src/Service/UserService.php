@@ -27,23 +27,22 @@ class UserService
         return $user;
 
     }
-    //might be done by a Form but I do not know how to use the form with a serializer i could use json_decode but i find it not elegant ...
     private function verifyUser(User $user):bool
     {
         //to be reworked
         if (!($user->getName() && $user->getFirstName() &&  $user->getEmail() &&  $user->getPhoneNumber())){
             return false;
         }
-        if(strlen($user->getName())<3){
+        if(strlen(trim($user->getName()))<3){
             return false;
         }
-        if(strlen($user->getFirstName())<3){
+        if(strlen(trim($user->getFirstName()))<3){
             return false;
         }
         if(strlen($user->getEmail())<3 || !filter_var($user->getEmail(),FILTER_VALIDATE_EMAIL )){
             return false;
         }
-        if(strlen($user->getPhoneNumber()<10)){
+        if(strlen($user->getPhoneNumber()<8)){
             return false;
         }
         return true;
