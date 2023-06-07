@@ -15,18 +15,14 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 class UserController extends AbstractController
 {
     #[Cache(maxage: 60, public: false, mustRevalidate: true)]
-    #[Route('client/{clientId}/users/{id/+}', name: "app_user_detail", methods: "GET")]
+    #[Route('api/users/{id/+}', name: "app_user_detail", methods: "GET")]
     public function detail(
-        int           $id,
-        int           $clientId,
+        int $id,
         SerializerService $serializerService,
         UserService   $service,
-        ClientService $clientService
     ): JsonResponse
     {
-
-        $client = $clientService->getValidClient($this->getUser(), $clientId);
-        $user = $service->getValidUser($id, $client);
+        $user = $service->getValidUser($id, $this->getUser());
         return new JsonResponse($serializerService->serialize('userList',$user),Response::HTTP_OK,[],true);
     }
 }

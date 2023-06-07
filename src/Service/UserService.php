@@ -21,7 +21,6 @@ class UserService
     public function __construct(
         private UserRepository    $repository,
         private CacheService      $cacheService,
-        private serializerService $serializerService
     )
     {
     }
