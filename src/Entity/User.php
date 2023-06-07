@@ -10,10 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
-//Problem with expressions trying to retrieve Username but couldn't find how
 
 /**
  * @Serializer\XmlRoot("product")
@@ -21,11 +18,21 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  * @Hateoas\Relation(
  *     "self",
  *     href= "expr('api/users/' ~ object.getId() )",
- *      exclusion= @Hateoas\Exclusion(groups="userList"))
+ *      exclusion = @Hateoas\Exclusion(groups="userDetails")
+ * )
  * @Hateoas\Relation(
  *     "list",
  *     href= "expr('api/clients/' ~ object.getClientName() ~ '/users/')",
- *     exclusion= @Hateoas\Exclusion(groups="userList"))
+ *     exclusion = @Hateoas\Exclusion(groups="userList")
+ * )
+ * @Hateoas\Relation (
+ *     "create",
+ *     href="api/users"
+ * )
+ * @Hateoas\Relation (
+ *     "delete",
+ *     href="expr('api/users/'~object.getId() ) "
+ * )
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -72,28 +79,18 @@ class User
     #[ORM\ManyToMany(targetEntity: Client::class, inversedBy: 'users')]
     private Collection $clients;
 
-    #[Serializer\Groups(['none'])]
-    private ?string $clientName = null;
-
-    /**
-     * @return string
-     */
     public function getClientName(): string|int
     {
-//here i need to find a way to get my client
-        if (null == $this->clientName) {
-            return $this->id;
+        if (!isset($security)) {
+            return 'securityNotSet';
         }
-        return $this->clientName;
+        return $this->security->getUser()->getUserIdentifier();
     }
-    public function setClientName(string $name)
-    {
-        $this->clientName = $name;
-        return $this;
 
-    }
-    public function __construct()
+    public function __construct( private readonly Security $security)
     {
+
+
         $this->clients = new ArrayCollection();
     }
 

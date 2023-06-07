@@ -54,7 +54,6 @@ class UserRepository extends ServiceEntityRepository
         }
         $users= $client->getUsers();
         $data = $users->slice(($page-1)*$limit,$limit);
-        $this->setCurrentClient($data, $client);
         $maxPage=  (int)ceil($users->count()/$limit);
         if($page > $maxPage){
             throw new \OutOfRangeException("You tried to request too much data", Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
@@ -63,18 +62,6 @@ class UserRepository extends ServiceEntityRepository
 
     }
 
-    /***
-     * @param Array<User> $data
-     * @param Client $client
-     * @return void
-     */
-    private function setCurrentClient(Array $data,Client $client): void
-    {
-        foreach ($data as $user)
-        {
-            $user->setClientName($client->getUsername());
-        }
-    }
 
 //    /**
 //     * @return User[] Returns an array of User objects

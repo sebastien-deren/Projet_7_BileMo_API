@@ -36,6 +36,7 @@ class UserController extends AbstractController
         $limit = (int)$request->query->get('limit', 10);
         $paginatedUser = $userService->PaginatedListUser($client, $page, $limit);
         $response = new JsonResponse($serializerService->serialize('userList', $paginatedUser->data), Response::HTTP_OK, [], true);
+
         $paginationHeader->setHeaders($response, $paginatedUser, 'app_user_list',["username"=> $client->getUsername()]);
         return $response;
     }

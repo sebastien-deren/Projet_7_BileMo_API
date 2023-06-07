@@ -21,6 +21,7 @@ class UserService
         $dataToGet = function (array $param)  {
             return $this->repository->getPaginateUsers($param['client'],$param['page'],$param['limit']);
         };
+
         return $this->cacheService->getCachedData($dataToGet, $cacheName, 'userList', ['client'=> $client, 'page'=> $page, 'limit'=> $limit]);
     }
     public function cacheNameUserList(string $client,int $page,int $limit): string
