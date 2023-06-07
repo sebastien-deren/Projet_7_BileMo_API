@@ -19,11 +19,12 @@ class UserService
 
     public function create(User $user,Client $client):User
     {
-        if(!$this->verifyUser($user)){
+        /*if(!$this->verifyUser($user)){
            throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
-        }
-        $user->addClient($client);
+        }*/
+        $user->initializeClients()->addClient($client);
         $this->repository->save($user,true);
+
         return $user;
 
     }

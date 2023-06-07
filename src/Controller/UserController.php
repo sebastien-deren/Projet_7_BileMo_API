@@ -19,9 +19,8 @@ class UserController extends AbstractController
 {
 
 
-    #[Route('api/clients/{username}/users', name:'app_user_create',methods: 'POST')]
+    #[Route('api/users', name:'app_user_create',methods: 'POST')]
     public function create(
-        Client $client,
         UserService $userService,
         Request $request,
         SerializerService $serializer)
@@ -29,11 +28,9 @@ class UserController extends AbstractController
         $user = $serializer->deserialize($request->getContent(),User::class,'json');
         $user = $userService->create($user,$this->getUser());
         $jsonUser = $serializer->serialize('userDetail',$user);
-        $location = $this->generateUrl( 'app_user_detail',
-            ['id'=>$user->getId(),'username'=>$client->getUserIdentifier()],
-            UrlGeneratorInterface::ABSOLUTE_URL);
+        //$location = $this->generateUrl( 'app_user_detail',['id'=>$user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        return new JsonResponse($jsonUser,Response::HTTP_CREATED,["location"=>$location],true);
+        return new JsonResponse($jsonUser,Response::HTTP_CREATED,["location"=>'$location'],true);
     }
 
 }
