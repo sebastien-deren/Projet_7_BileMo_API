@@ -197,6 +197,10 @@ class User
 
         return $this;
     }
+    public function initializeClients():self{
+        $this->clients = new ArrayCollection();
+        return $this;
+    }
 
     /**
      * @return Collection<int, Client>

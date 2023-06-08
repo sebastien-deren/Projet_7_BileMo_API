@@ -8,6 +8,8 @@ use App\Repository\UserRepository;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use App\Entity\User;
+
 
 
 
@@ -58,5 +60,36 @@ class UserService
             return 'userDetails'.$userId;
         }
 
+    public function create(User $user,Client $client):User
+    {
+        /*if(!$this->verifyUser($user)){
+           throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
+        }*/
+        $user->initializeClients()->addClient($client);
+        $this->repository->save($user,true);
+
+        return $user;
+
+    }
+    private function verifyUser(User $user):bool
+    {
+        //to be reworked
+        if (!($user->getName() && $user->getFirstName() &&  $user->getEmail() &&  $user->getPhoneNumber())){
+            return false;
+        }
+        if(strlen(trim($user->getName()))<3){
+            return false;
+        }
+        if(strlen(trim($user->getFirstName()))<3){
+            return false;
+        }
+        if(strlen($user->getEmail())<3 || !filter_var($user->getEmail(),FILTER_VALIDATE_EMAIL )){
+            return false;
+        }
+        if(strlen($user->getPhoneNumber()<8)){
+            return false;
+        }
+        return true;
+    }
 
 }

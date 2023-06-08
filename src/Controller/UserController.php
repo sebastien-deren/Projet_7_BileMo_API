@@ -3,24 +3,24 @@
 namespace App\Controller;
 
 use App\Entity\Client;
-use App\Repository\ClientRepository;
-use App\Service\Headers\PaginationHeaderInterface;
+use App\Entity\User;
+
 use App\Service\SerializerService;
 use App\Service\UserService;
-use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\Headers\PaginationHeaderInterface;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Attribute\Cache;
 
 
 class UserController extends AbstractController
 {
 
-    //#[Cache(maxage: 60, public: false, mustRevalidate: true)]
+    #[Cache(maxage: 60, public: false, mustRevalidate: true)]
     #[Route('/api/clients/{username}/users', name: 'app_user_list', methods: 'get')]
     public function list(
         Client                    $client,
@@ -52,4 +52,19 @@ class UserController extends AbstractController
         $user = $service->getValidUser($id, $this->getUser());
         return new JsonResponse($serializerService->serialize('userList',$user),Response::HTTP_OK,[],true);
     }
+
+    #[Route('api/users', name:'app_user_create',methods: 'POST')]
+    public function create(
+        UserService $userService,
+        Request $request,
+        SerializerService $serializer)
+    {
+        $user = $serializer->deserialize($request->getContent(),User::class,'json');
+        $user = $userService->create($user,$this->getUser());
+        $jsonUser = $serializer->serialize('userDetail',$user);
+        //$location = $this->generateUrl( 'app_user_detail',['id'=>$user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        return new JsonResponse($jsonUser,Response::HTTP_CREATED,["location"=>'$location'],true);
+    }
+
 }
