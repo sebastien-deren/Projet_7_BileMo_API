@@ -41,4 +41,15 @@ class UserController extends AbstractController
         return $response;
     }
 
+    #[Cache(maxage: 60, public: false, mustRevalidate: true)]
+    #[Route('api/users/{id}', name: "app_user_detail", methods: "GET")]
+    public function detail(
+        int $id,
+        SerializerService $serializerService,
+        UserService   $service
+    ): JsonResponse
+    {
+        $user = $service->getValidUser($id, $this->getUser());
+        return new JsonResponse($serializerService->serialize('userList',$user),Response::HTTP_OK,[],true);
+    }
 }

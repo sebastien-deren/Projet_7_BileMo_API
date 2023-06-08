@@ -36,6 +36,7 @@ use Symfony\Bundle\SecurityBundle\Security;
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[ORM\EntityListeners([UserListener::class])]
 class User
 {
     #[ORM\Id]
@@ -79,19 +80,21 @@ class User
     #[ORM\ManyToMany(targetEntity: Client::class, inversedBy: 'users')]
     private Collection $clients;
 
-    public function getClientName(): string|int
+    #[Serializer\Groups(['none'])]
+    private string $currentClientName;
+
+    public function __construct()
     {
-        if (!isset($security)) {
-            return 'securityNotSet';
-        }
-        return $this->security->getUser()->getUserIdentifier();
-    }
-
-    public function __construct( private readonly Security $security)
-    {
-
-
         $this->clients = new ArrayCollection();
+    }
+    public function getClientName():string
+    {
+        return $this->currentClientName;
+    }
+    public function setClientName(string $clientName):self
+    {
+        $this->currentClientName = $clientName;
+        return $this;
     }
 
     public function getId(): ?int
