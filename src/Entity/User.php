@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\EntityListeners([UserListener::class])]
 #[ORM\Table(name: '`user`')]
 class User
