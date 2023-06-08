@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
 use Symfony\Bundle\SecurityBundle\Security;
+use JMS\Serializer\Annotation\Groups;
 
 
 /**

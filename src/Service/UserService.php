@@ -91,5 +91,18 @@ class UserService
         }
         return true;
     }
+    public function delete(User $user,Client $client):User|false
+    {
+        if (!$client->getUsers()->contains($user)) {
+            return false;
+        }
+        if (1 === $user->getClients()->count()) {
+            $this->repository->remove($user, true);
+            return $user;
+        }
+        $user->removeClient($client);
+        $this->repository->save($user, true);
+        return $user;
+    }
 
 }
