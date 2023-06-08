@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
 
-#[Route('/api/')]
 class ProductController extends AbstractController
 {
     /**
@@ -29,7 +28,7 @@ class ProductController extends AbstractController
      */
     #[Cache(maxage: 3600, public: false, mustRevalidate: true)]
 
-    #[Route('products', name: 'app_product_list', methods: 'get')]
+    #[Route('/api/products', name: 'app_product_list', methods: 'get')]
     #[OA\Response(
         response: 200,
         description: 'return a paginated list of Product Summarized',
@@ -83,7 +82,7 @@ class ProductController extends AbstractController
     )]
     #[OA\Tag(name: 'Product')]
 
-    #[Route('products/{id<\d+>}', name: 'app_product_details', methods: 'get')]
+    #[Route('/api/products/{id<\d+>}', name: 'app_product_details', methods: 'get')]
     public function productDetails(
         int               $id,
         SerializerService $serializer,

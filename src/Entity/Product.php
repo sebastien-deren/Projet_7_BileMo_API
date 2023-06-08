@@ -18,12 +18,12 @@ use OpenApi\Attributes as OA;
  * @Hateoas\Relation(
  *     "self",
  *     href= "expr('api/products/' ~ object.getId())",
- *     exclusion = @Hateoas\Exclusion(groups="productDetails"))
+ *     exclusion = @Hateoas\Exclusion(groups="productList"))
  *
  * @Hateoas\Relation(
  *     "list",
  *     href="api/products",
- *     exclusion= @Hateoas\Exclusion(groups="productList"))
+ *     exclusion= @Hateoas\Exclusion(groups="productDetails"))
  */
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
