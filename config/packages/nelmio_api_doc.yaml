@@ -4,6 +4,8 @@ nelmio_api_doc:
             title: BileMo
             description: your favorite B2B mobile api
             version: 1.0.0
+        security:
+            - Bearer: [ ]
         components:
             securitySchemes:
                 Bearer:
@@ -20,9 +22,52 @@ nelmio_api_doc:
                         password:
                             type: string
                             description: you know what a password is right ?
-        security:
-            - Bearer: [ ]
+                Error:
+                    type: object
+                    properties:
+                        code:
+                            type: string
+                        message:
+                            type: string
+                    required:
+                        - code
+                        - message
+            responses:
+                NotFound:
+                    description: The specified resource was not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                Server:
+                    description: there has been an error in our server
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                Unauthorized:
+                    description: you do not have the authorization to access this ressource
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+
+
         paths:
+            Errors:
+                get:
+                    tags:
+                        - Errors
+                    summary: The Error Response you could expect
+                    description:
+                        list the different error type you could have using our api
+                    responses:
+                        '404':
+                            $ref: '#/components/responses/NotFound'
+                        '401':
+                            $ref: '#/components/responses/Unauthorized'
+                        '500':
+                            $ref: '#components/responses/Server'
             /api/login_check:
                 post:
                     tags:
@@ -54,5 +99,7 @@ nelmio_api_doc:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
     models:
         names:
-            - { alias: Product,        type: App\Entity\Product, groups: [productDetails] }
+            - { alias: Product Details,        type: App\Entity\Product, groups: [productDetails] }
             - { alias: Product Summary, type: App\Entity\Product, groups:[productList]}
+            - { alias: User Details, type: App\Entity\User, groups:[userDetails]}
+            - { alias: User Summary, type: App\Entity\User, groups:[userList]}

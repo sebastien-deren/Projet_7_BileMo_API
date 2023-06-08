@@ -19,20 +19,22 @@ use JMS\Serializer\Annotation\Groups;
  * @Hateoas\Relation(
  *     "self",
  *     href= "expr('api/users/' ~ object.getId() )",
- *      exclusion = @Hateoas\Exclusion(groups="userDetails")
+ *      exclusion = @Hateoas\Exclusion(groups="userList")
  * )
  * @Hateoas\Relation(
  *     "list",
  *     href= "expr('api/clients/' ~ object.getClientName() ~ '/users/')",
- *     exclusion = @Hateoas\Exclusion(groups="userList")
+ *     exclusion = @Hateoas\Exclusion(groups="userDetails")
  * )
  * @Hateoas\Relation (
  *     "create",
- *     href="api/users"
+ *     href="api/users",
+ *      exclusion= @Hateoas\Exclusion(groups={"userDetails","userList"})
  * )
  * @Hateoas\Relation (
  *     "delete",
- *     href="expr('api/users/'~object.getId() ) "
+ *     href="expr('api/users/'~object.getId() ) ",
+ *     exclusion= @Hateoas\Exclusion(groups={"userDetails","userList"})
  * )
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
