@@ -2,13 +2,26 @@
 
 namespace App\Entity;
 
+use App\Listener\UserListener;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
 
+/**
+ * @Serializer\XmlRoot("user")
+ *
+ * @Hateoas\Relation(
+ *     "list",
+ *      href="expr('api/clients/' ~ object.getClientName() ~ '/users')",
+ *      exclusion = @Hateoas\Exclusion(groups="userList")
+ * )
+ */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[ORM\EntityListeners([UserListener::class])]
 class User
 {
     #[ORM\Id]
@@ -43,9 +56,20 @@ class User
     #[ORM\ManyToMany(targetEntity: Client::class, inversedBy: 'users')]
     private Collection $clients;
 
+    private string $currentClientName;
+
     public function __construct()
     {
         $this->clients = new ArrayCollection();
+    }
+    public function getClientName():string
+    {
+        return $this->currentClientName;
+    }
+    public function setClientName(string $clientName):self
+    {
+        $this->currentClientName = $clientName;
+        return $this;
     }
 
     public function getId(): ?int
