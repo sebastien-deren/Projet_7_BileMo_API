@@ -30,7 +30,7 @@ class ProductService
      * @throws InvalidArgumentException
      * @throws \Exception
      */
-    public function ProductListPaginatedJsonResponse(int $page, int $limit): PaginationDto
+    public function productListPaginatedJsonResponse(int $page, int $limit): PaginationDto
     {
         if ($limit <= 0) {
             throw new \Exception("limit must be a positive integer", Response::HTTP_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -51,7 +51,7 @@ class ProductService
 
     }
 
-    public function cacheNamePage($page, $limit): string
+    public function cacheNamePage(int $page,int $limit): string
     {
         return 'productList-page' . $page . "-limit" . $limit;
     }

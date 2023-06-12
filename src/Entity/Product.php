@@ -24,7 +24,7 @@ use JMS\Serializer\Annotation\Groups;
  *     href="api/products",
  *     exclusion= @Hateoas\Exclusion(groups="productList"))
  */
-#[ORM\Entity(repositoryClass: ProductsRepository::class)]
+#[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
 {
     #[ORM\Id]
