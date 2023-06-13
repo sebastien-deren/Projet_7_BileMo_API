@@ -2,20 +2,21 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
 use App\Entity\User;
 use App\Service\SerializerService;
 use App\Service\UserService;
-use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Entity\Client;
-use App\Service\Headers\PaginationHeaderInterface;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use App\Service\Headers\PaginationHeaderInterface;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
 class UserController extends AbstractController
@@ -75,4 +76,18 @@ class UserController extends AbstractController
         }
         return new JsonResponse($serializer->serialize('userDetail', $data), Response::HTTP_NO_CONTENT, [], true);
     }
+
+    #[Route('api/users', name:'app_user_create',methods: 'POST')]
+    public function create(
+        UserService $userService,
+        Request $request,
+        SerializerService $serializer)
+    {
+        $user = $serializer->deserialize($request->getContent(),User::class,'json');
+        $user = $userService->create($user,$this->getUser());
+        $jsonUser = $serializer->serialize('userDetails',$user);
+        $location = $this->generateUrl( 'app_user_detail',['id'=>$user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($jsonUser,Response::HTTP_CREATED,["location"=>$location],true);
+    }
+
 }

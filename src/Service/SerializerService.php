@@ -29,6 +29,10 @@ class SerializerService
         $context->setAttribute('client',9);
         return $this->serializer->serialize($data,'json',$context);
     }
+    public function deserialize(string $data,string $type,string $format):mixed
+    {
+        return $this->serializer->deserialize($data,$type,$format);
+    }
 
 
 }
