@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 //Problem with expressions trying to retrieve Username but couldn't find how
 
 /**
- * @Serializer\XmlRoot("product")
+ * @Serializer\XmlRoot("user")
  *
  * @Hateoas\Relation(
  *     "self",
@@ -28,6 +28,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
  *     exclusion= @Hateoas\Exclusion(groups="userList"))
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\Table(name: '`user`')]
 class User
 {
@@ -73,28 +74,20 @@ class User
     private Collection $clients;
 
     #[Serializer\Groups(['none'])]
-    private ?string $clientName = null;
+    private ?string $currentClientName = null;
 
-    /**
-     * @return string
-     */
-    public function getClientName(): string|int
-    {
-//here i need to find a way to get my client
-        if (null == $this->clientName) {
-            return $this->id;
-        }
-        return $this->clientName;
-    }
-    public function setClientName(string $name)
-    {
-        $this->clientName = $name;
-        return $this;
-
-    }
     public function __construct()
     {
         $this->clients = new ArrayCollection();
+    }
+    public function getClientName():string
+    {
+        return $this->currentClientName;
+    }
+    public function setClientName(string $clientName):self
+    {
+        $this->currentClientName = $clientName;
+        return $this;
     }
 
     public function getId(): ?int

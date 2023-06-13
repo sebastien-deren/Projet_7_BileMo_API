@@ -2,7 +2,10 @@
 
 namespace App\Test\Controller;
 
+use App\Entity\Client;
 use App\Entity\User;
+use App\Repository\ClientRepository;
+use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -11,11 +14,16 @@ class UserControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
     private UserRepository $repository;
-    private string $path = '/users/';
+    private Client $testClient;
+    private string $path = '/api/users/';
 
     protected function setUp(): void
     {
+
         $this->client = static::createClient();
+        $userRepository = static::getContainer()->get(ClientRepository::class);
+        $this->testClient = $userRepository->findOneBy(["username" => 'green']);
+        $this->client->loginUser($this->testClient);
         $this->repository = static::getContainer()->get('doctrine')->getRepository(User::class);
 
         foreach ($this->repository->findAll() as $object) {
@@ -25,7 +33,7 @@ class UserControllerTest extends WebTestCase
 
     public function testIndex(): void
     {
-        $crawler = $this->client->request('GET', $this->path);
+        $crawler = $this->client->request('GET', sprintf('/api/clients/%s%s',$this->testClient,'/users/'));
 
         self::assertResponseStatusCodeSame(200);
         self::assertPageTitleContains('User index');
@@ -72,7 +80,6 @@ class UserControllerTest extends WebTestCase
         $fixture->setStreetNumber('My Title');
         $fixture->setZipCode('My Title');
         $fixture->setCity('My Title');
-        $fixture->setClients('My Title');
 
         $this->repository->save($fixture, true);
 
