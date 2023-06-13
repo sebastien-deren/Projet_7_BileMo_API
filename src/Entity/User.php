@@ -2,12 +2,33 @@
 
 namespace App\Entity;
 
+use App\Listener\UserListener;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as Serializer;
+use Hateoas\Configuration\Annotation as Hateoas;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
+//Problem with expressions trying to retrieve Username but couldn't find how
+
+/**
+ * @Serializer\XmlRoot("user")
+ *
+ * @Hateoas\Relation(
+ *     "self",
+ *     href= "expr('api/users/' ~ object.getId() )",
+ *      exclusion= @Hateoas\Exclusion(groups="userList"))
+ * @Hateoas\Relation(
+ *     "list",
+ *     href= "expr('api/clients/' ~ object.getClientName() ~ '/users/')",
+ *     exclusion= @Hateoas\Exclusion(groups="userList"))
+ */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\EntityListeners([UserListener::class])]
 #[ORM\Table(name: '`user`')]
 class User
 {
@@ -16,36 +37,57 @@ class User
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Serializer\Groups(['userList', 'userDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
+    #[Serializer\Groups(['userList', 'userDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
 
+    #[Serializer\Groups(['userList', 'userDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+    #[Serializer\Groups(['userDetails'])]
     #[ORM\Column(length: 255)]
     private ?string $phoneNumber = null;
 
+    #[Serializer\Groups(['userDetails'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $street = null;
 
+    #[Serializer\Groups(['userDetails'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $streetNumber = null;
 
+    #[Serializer\Groups(['userDetails'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $zipCode = null;
 
+    #[Serializer\Groups(['userDetails'])]
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $city = null;
 
+    #[Serializer\Groups(['none'])]
     #[ORM\ManyToMany(targetEntity: Client::class, inversedBy: 'users')]
     private Collection $clients;
+
+    #[Serializer\Groups(['none'])]
+    private ?string $currentClientName = null;
 
     public function __construct()
     {
         $this->clients = new ArrayCollection();
+    }
+    public function getClientName():string
+    {
+        return $this->currentClientName;
+    }
+    public function setClientName(string $clientName):self
+    {
+        $this->currentClientName = $clientName;
+        return $this;
     }
 
     public function getId(): ?int
