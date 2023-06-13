@@ -62,7 +62,12 @@ class UserController extends AbstractController
         UserService       $service): JsonResponse
     {
         if ($client !== $this->getUser()) {
-            throw new UnauthorizedHttpException('bearer token ');
+            throw new UnauthorizedHttpException(
+                'bearer token ',
+                "You don't have access to this ",
+                null,
+                Response::HTTP_FORBIDDEN
+            );
         }
         $data = $service->delete($user, $client);
         if (!$data) {
