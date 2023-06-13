@@ -38,12 +38,10 @@ class UserListener
 
     private function findChangedClient(Collection $oldClients, Collection $newClients): Client
     {
-        foreach ($oldClients as $client) {
-            if (!$newClients->contains($client)) {
-               return $client;
-            }
-        }
-        throw new \Exception("not Attainable Exception");
+        return $oldClients->filter(function($client) use ($newClients) {
+           return !$newClients->contains($client);
+        })->first() ?? throw new \Exception("not Attainable Exception");
+
     }
 
 
@@ -60,7 +58,7 @@ class UserListener
 }
 
     #[On\PreRemove]
-    public function clearCacheDeletedUser(PreRemoveEventArgs $eventArgs)
+    public function clearCacheDeletedUser(PreRemoveEventArgs $eventArgs):void
 {
     $entity = $eventArgs->getObject();
     $client = $entity->getClients()->first();
