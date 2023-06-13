@@ -8,5 +8,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 interface PaginationHeaderInterface
 {
-    public function setHeaders(JsonResponse $response,PaginationDto $pagination,string $route):JsonResponse;
+    /**
+     * @param JsonResponse $response
+     * @param PaginationDto $pagination
+     * @param string $route
+     * @param array $requiredRouteArgument
+     * @return JsonResponse
+     */
+    public function setHeaders(JsonResponse $response,PaginationDto $pagination,string $route,array $requiredRouteArgument = []):JsonResponse;
 }
