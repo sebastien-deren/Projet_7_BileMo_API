@@ -16,6 +16,7 @@ use App\Service\Headers\PaginationHeaderInterface;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 
 class UserController extends AbstractController
@@ -84,10 +85,9 @@ class UserController extends AbstractController
     {
         $user = $serializer->deserialize($request->getContent(),User::class,'json');
         $user = $userService->create($user,$this->getUser());
-        $jsonUser = $serializer->serialize('userDetail',$user);
-        //$location = $this->generateUrl( 'app_user_detail',['id'=>$user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-
-        return new JsonResponse($jsonUser,Response::HTTP_CREATED,["location"=>'$location'],true);
+        $jsonUser = $serializer->serialize('userDetails',$user);
+        $location = $this->generateUrl( 'app_user_detail',['id'=>$user->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        return new JsonResponse($jsonUser,Response::HTTP_CREATED,["location"=>$location],true);
     }
 
 }
