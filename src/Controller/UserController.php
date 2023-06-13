@@ -51,7 +51,7 @@ class UserController extends AbstractController
     ): JsonResponse
     {
         $user = $service->getValidUser($id, $this->getUser());
-        return new JsonResponse($serializerService->serialize('userList', $user), Response::HTTP_OK, [], true);
+        return new JsonResponse($serializerService->serialize('userDetails', $user), Response::HTTP_OK, [], true);
     }
 
     #[Route('/api/clients/{id}/users/{user_id}', name: 'app_user_delete', methods: 'delete')]

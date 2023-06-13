@@ -24,7 +24,13 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *     "list",
  *     href= "expr('api/clients/' ~ object.getClientName() ~ '/users/')",
- *     exclusion= @Hateoas\Exclusion(groups="userList"))
+ *     exclusion= @Hateoas\Exclusion(groups="userDetails"))
+ * @Hateoas\Relation(
+ *     "create",
+ *     href="expr('api/users/')")
+ * @Hateoas\Relation(
+ *     "delete",
+ *     href="expr('api/users/' ~ object.getId())")
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\EntityListeners([UserListener::class])]
