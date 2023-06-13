@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/')]
 class ProductController extends AbstractController
 {
     /**
@@ -21,7 +20,7 @@ class ProductController extends AbstractController
      * @throws \Exception
      */
     #[Cache(maxage: 3600, public: false, mustRevalidate: true)]
-    #[Route('products', name: 'app_product_list', methods: 'get')]
+    #[Route('/api/products', name: 'app_product_list', methods: 'get')]
     public function list(Request           $request,
                          ProductService    $productService,
                          SerializerService $serializerService,
@@ -35,7 +34,7 @@ class ProductController extends AbstractController
         return $response;
     }
     #[Cache(maxage: 3600,public: false,mustRevalidate: true)]
-    #[Route('products/{id<\d+>}', name: 'app_product_details',methods: 'get')]
+    #[Route('/api/products/{id<\d+>}', name: 'app_product_details',methods: 'get')]
     public function productDetails(
         int $id,
         SerializerService $serializer,
