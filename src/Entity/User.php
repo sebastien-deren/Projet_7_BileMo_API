@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Listener\User\PostLoadListener;
 use App\Listener\UserListener;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;

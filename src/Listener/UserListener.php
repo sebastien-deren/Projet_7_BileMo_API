@@ -34,7 +34,7 @@ class UserListener
             $newClients = $eventArgs->getNewValue('Client');
             $client = $this->findChangedClient($oldClients, $newClients);
             $this->cacheService->destructCacheByTags(['userList' . $client->getId()]);
-            $this->cacheService->destructCacheByName(($this->userService->cacheNameUserDetail($user->getId(), $client->getId())));
+            $this->cacheService->destructCacheByName(($this->userService->cacheNameDetail($user->getId())));
         }
         //other changes to users that need cache Clearing can go there
 
@@ -67,12 +67,11 @@ class UserListener
         $entity = $eventArgs->getObject();
         $client = $entity->getClients()->first();
         $this->cacheService->destructCacheByTags(['userList' . $client->getId()]);
-        $this->cacheService->destructCacheByName(($this->userService->cacheNameUserDetail($entity->getId(), $client->getId())));
+        $this->cacheService->destructCacheByName(($this->userService->cacheNameDetail($entity->getId())));
     }
 
-
     #[On\PostLoad]
-    #[NoReturn] public function postLoadEvent(User $user, PostLoadEventArgs $eventArgs): void
+    #[NoReturn] public function postLoadEvent(User $user,PostLoadEventArgs $eventArgs):void
     {
         $user->setClientName($this->security->getUser()->getUserIdentifier());
     }
