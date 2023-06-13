@@ -2,12 +2,9 @@
 
 namespace App\Repository;
 
-use App\DTO\PaginationDto;
-use App\Entity\Client;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpFoundation\Response;
 use function Doctrine\ORM\QueryBuilder;
 
 /**
