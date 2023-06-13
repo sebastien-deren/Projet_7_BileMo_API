@@ -11,19 +11,13 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use App\DTO\PaginationDto;
 
 
-
 class UserService
 {
     public function __construct(
-        private UserRepository    $repository,
-        private CacheService      $cacheService,
+        private UserRepository $repository,
+        private CacheService   $cacheService,
     )
     {
-    }
-
-    public function findOneValid(int $id, int $clientId)
-    {
-        return $this->repository->find($id) ?? throw new RouteNotFoundException();
     }
 
     public function getValidUser(int $id, Client $client): User
@@ -45,23 +39,25 @@ class UserService
             ['id' => $id, 'client' => $client]);
 
     }
-        public function cacheNameDetail($userId)
-        {
-            return 'userDetails'.$userId;
-        }
 
-    public function PaginatedListUser(Client $client,int $page, int $limit):PaginationDto
+    public function cacheNameDetail(int $userId): string
     {
-
-        $cacheName = $this->cacheNameUserList($client->getUserIdentifier(),$page,$limit);
-        $dataToGet = function (array $param)  {
-            return $this->repository->getPaginateUsers($param['client'],$param['page'],$param['limit']);
-        };
-        return $this->cacheService->getCachedData($dataToGet, $cacheName, 'userList', ['client'=> $client, 'page'=> $page, 'limit'=> $limit]);
+        return 'userDetails' . $userId;
     }
-    public function cacheNameUserList(string $client,int $page,int $limit): string
+
+    public function paginatedListUser(Client $client, int $page, int $limit): PaginationDto
     {
-        return  'UserList-Client' . $client . '-page' . $page . "-limit".$limit;
+
+        $cacheName = $this->cacheNameUserList($client->getUserIdentifier(), $page, $limit);
+        $dataToGet = function (array $param) {
+            return $this->repository->getPaginateUsers($param['client'], $param['page'], $param['limit']);
+        };
+        return $this->cacheService->getCachedData($dataToGet, $cacheName, 'userList', ['client' => $client, 'page' => $page, 'limit' => $limit]);
+    }
+
+    public function cacheNameUserList(string $client, int $page, int $limit): string
+    {
+        return 'UserList-Client' . $client . '-page' . $page . "-limit" . $limit;
     }
 
 
