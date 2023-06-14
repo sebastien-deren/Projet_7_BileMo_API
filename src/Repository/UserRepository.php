@@ -8,6 +8,7 @@ use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use function Doctrine\ORM\QueryBuilder;
 
 /**
@@ -56,10 +57,12 @@ class UserRepository extends ServiceEntityRepository
         }
         $users = $client->getUsers();
         $data = $users->slice(($page - 1) * $limit, $limit);
+        //need to unset the array keys to have a formatted json response similar between pages
+        $data = array_values($data);
         $this->setCurrentClient($data, $client);
         $maxPage = (int)ceil($users->count() / $limit);
         if ($page > $maxPage) {
-            throw new \OutOfRangeException("You tried to request too much data", Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
+            throw new RouteNotFoundException();
         }
         return new PaginationDto($page, $limit, $maxPage, $data);
 

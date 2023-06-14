@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class ProductController extends AbstractController
 {
@@ -41,6 +42,9 @@ class ProductController extends AbstractController
         ProductService $productService): JsonResponse
     {
         $product = $productService->productDetail($id);
+        if(null === $product){
+            throw new RouteNotFoundException();
+        }
         return new JsonResponse($serializer->serialize('productDetails',$product),Response::HTTP_OK,[],true);
 
     }
