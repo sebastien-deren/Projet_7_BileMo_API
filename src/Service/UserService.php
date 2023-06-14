@@ -2,38 +2,25 @@
 
 namespace App\Service;
 
-use App\DTO\PaginationDto;
 use App\Entity\Client;
+use App\Entity\User;
 use App\Repository\UserRepository;
+
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use App\Entity\User;
-
-
+use App\DTO\PaginationDto;
 
 
 class UserService
 {
-    public function __construct(private UserRepository $repository,private CacheService $cacheService){}
-    public function PaginatedListUser(Client $client,int $page, int $limit):PaginationDto
+    public function __construct(
+        private UserRepository $repository,
+        private CacheService   $cacheService,
+    )
     {
-
-        $cacheName = $this->cacheNameUserList($client->getUserIdentifier(),$page,$limit);
-        $dataToGet = function (array $param)  {
-            return $this->repository->getPaginateUsers($param['client'],$param['page'],$param['limit']);
-        };
-
-        return $this->cacheService->getCachedData($dataToGet, $cacheName, 'userList', ['client'=> $client, 'page'=> $page, 'limit'=> $limit]);
-    }
-    public function cacheNameUserList(string $client,int $page,int $limit): string
-    {
-        return  'UserList-Client' . $client . '-page' . $page . "-limit".$limit;
-    }
-
-    public function findOneValid(int $id, int $clientId)
-    {
-        return $this->repository->find($id) ?? throw new RouteNotFoundException();
     }
 
     public function getValidUser(int $id, Client $client): User
@@ -55,43 +42,28 @@ class UserService
             ['id' => $id, 'client' => $client]);
 
     }
-        public function cacheNameDetail($userId)
-        {
-            return 'userDetails'.$userId;
-        }
 
-    public function create(User $user,Client $client):User
+    public function cacheNameDetail(int $userId): string
     {
-        /*if(!$this->verifyUser($user)){
-           throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
-        }*/
-        $user->initializeClients()->addClient($client);
-        $this->repository->save($user,true);
-
-        return $user;
-
+        return 'userDetails' . $userId;
     }
-    private function verifyUser(User $user):bool
+
+    public function paginatedListUser(Client $client, int $page, int $limit): PaginationDto
     {
-        //to be reworked
-        if (!($user->getName() && $user->getFirstName() &&  $user->getEmail() &&  $user->getPhoneNumber())){
-            return false;
-        }
-        if(strlen(trim($user->getName()))<3){
-            return false;
-        }
-        if(strlen(trim($user->getFirstName()))<3){
-            return false;
-        }
-        if(strlen($user->getEmail())<3 || !filter_var($user->getEmail(),FILTER_VALIDATE_EMAIL )){
-            return false;
-        }
-        if(strlen($user->getPhoneNumber()<8)){
-            return false;
-        }
-        return true;
+
+        $cacheName = $this->cacheNameUserList($client->getUserIdentifier(), $page, $limit);
+        $dataToGet = function (array $param) {
+            return $this->repository->getPaginateUsers($param['client'], $param['page'], $param['limit']);
+        };
+        return $this->cacheService->getCachedData($dataToGet, $cacheName, 'userList' . $client->getId(), ['client' => $client, 'page' => $page, 'limit' => $limit]);
     }
-    public function delete(User $user,Client $client):User|false
+
+    public function cacheNameUserList(string $client, int $page, int $limit): string
+    {
+        return 'UserList-Client' . $client . '-page' . $page . "-limit" . $limit;
+    }
+
+    public function delete(User $user, Client $client): User|false
     {
         if (!$client->getUsers()->contains($user)) {
             return false;
@@ -104,5 +76,40 @@ class UserService
         $this->repository->save($user, true);
         return $user;
     }
+
+    public function create(User $user, Client $client): User
+    {
+        if(!$this->verifyUser($user)){
+           throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
+        }
+        $user->initializeClients()->addClient($client);
+        $this->repository->save($user, true);
+
+        return $user;
+
+    }
+
+    private function verifyUser(User $user): bool
+    {
+        //to be reworked
+        if (!($user->getName() && $user->getFirstName() && $user->getEmail() && $user->getPhoneNumber())) {
+            return false;
+        }
+        if (strlen(trim($user->getName())) < 3) {
+            return false;
+        }
+        if (strlen(trim($user->getFirstName())) < 3) {
+            return false;
+        }
+        if (strlen($user->getEmail()) < 3 || !filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+        if (strlen($user->getPhoneNumber() < 8)) {
+            return false;
+        }
+        return true;
+    }
+
+
 
 }

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Listener\User\PostLoadListener;
 use App\Listener\UserListener;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,37 +10,31 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Hateoas\Configuration\Annotation as Hateoas;
-use Symfony\Bundle\SecurityBundle\Security;
-use JMS\Serializer\Annotation\Groups;
 
+
+//Problem with expressions trying to retrieve Username but couldn't find how
 
 /**
- * @Serializer\XmlRoot("product")
+ * @Serializer\XmlRoot("user")
  *
  * @Hateoas\Relation(
  *     "self",
  *     href= "expr('api/users/' ~ object.getId() )",
- *      exclusion = @Hateoas\Exclusion(groups="userList")
- * )
+ *      exclusion= @Hateoas\Exclusion(groups="userList"))
  * @Hateoas\Relation(
  *     "list",
  *     href= "expr('api/clients/' ~ object.getClientName() ~ '/users/')",
- *     exclusion = @Hateoas\Exclusion(groups="userDetails")
- * )
- * @Hateoas\Relation (
+ *     exclusion= @Hateoas\Exclusion(groups="userDetails"))
+ * @Hateoas\Relation(
  *     "create",
- *     href="api/users",
- *      exclusion= @Hateoas\Exclusion(groups={"userDetails","userList"})
- * )
- * @Hateoas\Relation (
+ *     href="expr('api/users/')")
+ * @Hateoas\Relation(
  *     "delete",
- *     href="expr('api/users/'~object.getId() ) ",
- *     exclusion= @Hateoas\Exclusion(groups={"userDetails","userList"})
- * )
+ *     href="expr('api/users/' ~ object.getId())")
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
 #[ORM\EntityListeners([UserListener::class])]
+#[ORM\Table(name: '`user`')]
 class User
 {
     #[ORM\Id]
@@ -84,7 +79,7 @@ class User
     private Collection $clients;
 
     #[Serializer\Groups(['none'])]
-    private string $currentClientName;
+    private ?string $currentClientName = null;
 
     public function __construct()
     {

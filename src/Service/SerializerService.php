@@ -4,6 +4,7 @@ namespace App\Service;
 
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
+use Symfony\Config\JmsSerializer\DefaultContext\SerializationConfig;
 
 class SerializerService
 {

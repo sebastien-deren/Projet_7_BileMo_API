@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\Cache;
 use Symfony\Component\Routing\Annotation\Route;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class ProductController extends AbstractController
 {
@@ -89,7 +90,10 @@ class ProductController extends AbstractController
         ProductService    $productService): JsonResponse
     {
         $product = $productService->productDetail($id);
-        return new JsonResponse($serializer->serialize('productDetails', $product), Response::HTTP_OK, [], true);
+        if(null === $product){
+            throw new RouteNotFoundException();
+        }
+        return new JsonResponse($serializer->serialize('productDetails',$product),Response::HTTP_OK,[],true);
 
     }
 }

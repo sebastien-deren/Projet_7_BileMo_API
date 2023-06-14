@@ -19,7 +19,7 @@ class PaginationHeadersHandler implements PaginationHeaderInterface
         $lastPage = '<' . $this->routeGeneration($route, $pagination->maxPage, $limit,$requiredRouteArgument) . '>; rel="last", ';
         $firstPage = '<' . $this->routeGeneration($route, 1, $limit,$requiredRouteArgument) . '>; rel="first"';
         $prev = $page === 1 ? "" : '<' . $this->routeGeneration($route, $page - 1, $limit,$requiredRouteArgument) . '>; rel="prev", ';
-        $next = $page === $lastPage ? "" : '<' . $this->routeGeneration($route, $page + 1, $limit,$requiredRouteArgument) . '>; rel="next", ';
+        $next = $page === $pagination->maxPage ? "" : '<' . $this->routeGeneration($route, $page + 1, $limit,$requiredRouteArgument) . '>; rel="next", ';
 
         $response->headers->set("link", $prev . $next . $lastPage . $firstPage);
         return $response;
