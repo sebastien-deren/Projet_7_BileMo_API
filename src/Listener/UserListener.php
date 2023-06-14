@@ -34,7 +34,8 @@ class UserListener
             $newClients = $eventArgs->getNewValue('Client');
             $client = $this->findChangedClient($oldClients, $newClients);
             $this->cacheService->destructCacheByTags(['userList' . $client->getId()]);
-            $this->cacheService->destructCacheByName(($this->userService->cacheNameUserDetail($user->getId(), $client->getId())));
+            $this->cacheService->destructCacheByName(($this->userService->cacheNameDetail($user->getId())));
+
         }
         //other changes to users that need cache Clearing can go there
 
@@ -52,28 +53,32 @@ class UserListener
     #[On\PostPersist]
     public function clearCache(User $user, PostUpdateEventArgs|PostPersistEventArgs $eventArgs): void
     {
+        $this->setClientName($user);
         $clients = $user->getClients();
-        $cacheNames = [];
-        foreach ($clients as $client) {
-            $cacheNames[] = 'userList' . $client->getId();
-        }
-        $this->cacheService->destructCacheByTags($cacheNames);
+        $cacheNames = $clients->map(function ($client){
+            return 'userList'.$client->getId();
+        });
+        $this->cacheService->destructCacheByTags($cacheNames->toArray());
+        $this->cacheService->destructCacheByName(($this->userService->cacheNameDetail($user->getId())));
 
     }
 
     #[On\PreRemove]
-    public function clearCacheDeletedUser(PreRemoveEventArgs $eventArgs): void
+    public function clearCacheDeletedUser(User $user,PreRemoveEventArgs $eventArgs): void
     {
-        $entity = $eventArgs->getObject();
-        $client = $entity->getClients()->first();
+        $client = $user->getClients()->first();
         $this->cacheService->destructCacheByTags(['userList' . $client->getId()]);
-        $this->cacheService->destructCacheByName(($this->userService->cacheNameUserDetail($entity->getId(), $client->getId())));
+        $this->cacheService->destructCacheByName(($this->userService->cacheNameDetail($user->getId())));
     }
 
-
     #[On\PostLoad]
-    #[NoReturn] public function postLoadEvent(User $user, PostLoadEventArgs $eventArgs): void
+    #[NoReturn] public function postLoadEvent(User $user,PostLoadEventArgs $eventArgs):void
     {
-        $user->setClientName($this->security->getUser()->getUserIdentifier());
+        $this->setClientName($user);
+
+    }
+    private function setClientName(User $user)
+    {
+        $user->setClientName($this->security->getUser()?->getUserIdentifier()??'null');
     }
 }

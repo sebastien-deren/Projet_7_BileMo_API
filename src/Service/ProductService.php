@@ -16,10 +16,10 @@ class ProductService
     {
     }
 
-    public function productDetail(int $id): Product
+    public function productDetail(int $id): Product|null
     {
 
-        $cacheName = 'product' . $id;
+        $cacheName = $this->cacheNameDetail($id);
         $dataToGet = function (array $param) {
             return $this->repository->find($param['id']);
         };

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Client;
 use App\Entity\User;
+use App\Service\CacheService;
 use App\Service\SerializerService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +23,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class UserController extends AbstractController
 {
 
-    #[Cache(maxage: 60, public: false, mustRevalidate: true)]
+    #[Cache(maxage: 10, public: false, mustRevalidate: true)]
     #[Route('/api/clients/{username}/users', name: 'app_user_list', methods: 'get')]
     public function list(
         Client                    $client,
@@ -42,7 +43,7 @@ class UserController extends AbstractController
         return $response;
     }
 
-    #[Cache(maxage: 60, public: false, mustRevalidate: true)]
+    #[Cache(maxage: 10, public: false, mustRevalidate: true)]
     #[Route('api/users/{id}', name: "app_user_detail", methods: "GET")]
     public function detail(
         int               $id,
@@ -51,26 +52,16 @@ class UserController extends AbstractController
     ): JsonResponse
     {
         $user = $service->getValidUser($id, $this->getUser());
-        return new JsonResponse($serializerService->serialize('userList', $user), Response::HTTP_OK, [], true);
+        return new JsonResponse($serializerService->serialize('userDetails', $user), Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/clients/{id}/users/{user_id}', name: 'app_user_delete', methods: 'delete')]
+    #[Route('/api/users/{id}', name: 'app_user_delete', methods: 'delete')]
     public function delete(
-        #[MapEntity(expr: 'repository.find(user_id)')]
         User              $user,
         SerializerService $serializer,
-        Client            $client,
         UserService       $service): JsonResponse
     {
-        if ($client !== $this->getUser()) {
-            throw new UnauthorizedHttpException(
-                'bearer token ',
-                "You don't have access to this ",
-                null,
-                Response::HTTP_FORBIDDEN
-            );
-        }
-        $data = $service->delete($user, $client);
+        $data = $service->delete($user, $this->getUser());
         if (!$data) {
             return new JsonResponse('you don\'t have access to this client', Response::HTTP_FORBIDDEN, [], false);
         }
