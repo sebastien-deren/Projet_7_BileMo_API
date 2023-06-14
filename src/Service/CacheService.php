@@ -12,7 +12,9 @@ Class CacheService
 
     public function getCachedData(\Closure $dataToGet,string $cacheName,?string $tag =null,?array $closureParam=null):mixed{
         return $this->cache->get($cacheName,function(ItemInterface $item)use($tag, $dataToGet,$closureParam){
-            is_string($tag) ?: $item->tag($tag);
+            if(null !== $tag){
+                $item->tag($tag);
+            }
             $item->expiresAfter(3600);
             return $dataToGet($closureParam);
         });
