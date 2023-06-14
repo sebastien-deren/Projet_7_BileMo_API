@@ -27,7 +27,7 @@ class UserListener
     }
 
     #[On\PreUpdate]
-    public function clearUpdatedCache(User $user, PreUpdateEventArgs $eventArgs)
+    public function clearUpdatedCache(User $user, PreUpdateEventArgs $eventArgs):void
     {
         if ($eventArgs->hasChangedField('Client')) {
             $oldClients = $eventArgs->getOldValue('Client');
@@ -55,7 +55,7 @@ class UserListener
     {
         $this->setClientName($user);
         $clients = $user->getClients();
-        $cacheNames = $clients->map(function ($client){
+        $cacheNames = $clients->map(function (Client $client){
             return 'userList'.$client->getId();
         });
         $this->cacheService->destructCacheByTags($cacheNames->toArray());
@@ -77,7 +77,7 @@ class UserListener
         $this->setClientName($user);
 
     }
-    private function setClientName(User $user)
+    private function setClientName(User $user):void
     {
         $user->setClientName($this->security->getUser()?->getUserIdentifier()??'null');
     }
