@@ -23,7 +23,8 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use OpenApi\Attributes as OA;
 
-
+#[OA\Tag(name: 'User')]
+#[Security(name: 'Bearer')]
 class UserController extends AbstractController
 {
 
@@ -48,8 +49,7 @@ class UserController extends AbstractController
             items: new OA\Items(ref: new Model(type: User::class, groups: ['userList']))
         )
     )]
-    #[OA\Tag(name: 'User')]
-    #[Security(name: 'Bearer')]
+
     #[OA\QueryParameter(name: 'page', description: 'page number', schema: new OA\Schema(type:'string'))]
     #[OA\QueryParameter(name: 'limit', description: 'number of user per pages', schema: new OA\Schema(type:'string'))]
     #[Cache(maxage: 60, public: false, mustRevalidate: true)]
