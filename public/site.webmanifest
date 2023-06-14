@@ -1,0 +1,14 @@
+{
+    "lang": "fr-FR",
+    "name": "Blog Sébastien DEREN",
+    "short_name": "Blog SD",
+    "description": "A blog with many cool article",
+    "scope": "/",
+    "orientation": "landscape",
+    "display": "fullscreen",
+    "background_color": "#42a7ff",
+    "theme_color": "rgb(98, 134, 138)",
+    "icons": [
+        { "src": "/favicon.ico", "sizes": "48x48", "type": "image/webp" }
+    ]
+}
