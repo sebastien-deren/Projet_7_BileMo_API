@@ -2,9 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\Product;
-use Hateoas\Hateoas;
-use Hateoas\HateoasBuilder;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Config\JmsSerializer\DefaultContext\SerializationConfig;
@@ -24,9 +21,6 @@ class SerializerService
     public function serialize(string $group,mixed $data):string
     {
         $context = SerializationContext::create()->setGroups(['Default',$group]);
-        $context->getCurrentPath();
-        $hateoas = HateoasBuilder::create()->setExpressionContextVariable('client','green')->build();
-        $context->setAttribute('client',9);
         return $this->serializer->serialize($data,'json',$context);
     }
     public function deserialize(string $data,string $type,string $format):mixed

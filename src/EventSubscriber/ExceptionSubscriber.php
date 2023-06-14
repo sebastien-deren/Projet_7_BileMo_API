@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use PHPUnit\Util\Json;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -31,6 +32,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
             new JsonResponse($exception->getMessage(), 500),
             $exception instanceof \InvalidArgumentException || $exception instanceof NotFoundHttpException =>
             new JsonResponse('No data found at this route', 404),
+            $exception instanceof BadRequestException => new jsonResponse($exception->getMessage(),$exception->getCode()),
             $exception instanceof HttpException =>
             new JsonResponse("An internal error has occured", 500),
             //default

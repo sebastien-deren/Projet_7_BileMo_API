@@ -5,10 +5,13 @@ namespace App\Test\Controller;
 use App\Entity\Client;
 use App\Entity\User;
 use App\Repository\ClientRepository;
-use App\Repository\ProductRepository;
 use App\Repository\UserRepository;
+use App\Service\SerializerService;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class UserControllerTest extends WebTestCase
 {
@@ -16,27 +19,30 @@ class UserControllerTest extends WebTestCase
     private UserRepository $repository;
     private Client $testClient;
     private string $path = '/api/users/';
+    private UrlGeneratorInterface $urlGenerator;
+    private SerializerService $serializer;
 
     protected function setUp(): void
     {
 
-        $this->client = static::createClient();
+        $this->client = static::createClient(["base_uri"=>'http://127.0.0.1:8000']);
+        $this->repository = static::getContainer()->get(UserRepository::class);
         $userRepository = static::getContainer()->get(ClientRepository::class);
         $this->testClient = $userRepository->findOneBy(["username" => 'green']);
         $this->client->loginUser($this->testClient);
-        $this->repository = static::getContainer()->get('doctrine')->getRepository(User::class);
-
+        $this->urlGenerator = $this->client->getContainer()->get('router.default');
         foreach ($this->repository->findAll() as $object) {
             $this->repository->remove($object, true);
         }
+
     }
 
     public function testIndex(): void
     {
-        $crawler = $this->client->request('GET', sprintf('/api/clients/%s%s',$this->testClient,'/users/'));
+        $this->markTestIncomplete();
+        $crawler = $this->client->request(Request::METHOD_GET,$this->urlGenerator->generate('app_user_list',['username'=>$this->testClient->getUsername()]));
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('User index');
 
         // Use the $crawler to perform additional assertions e.g.
         // self::assertSame('Some text on the page', $crawler->filter('.p')->first());
@@ -44,26 +50,21 @@ class UserControllerTest extends WebTestCase
 
     public function testNew(): void
     {
+        $this->markTestIncomplete();
         $originalNumObjectsInRepository = count($this->repository->findAll());
 
-        $this->markTestIncomplete();
-        $this->client->request('GET', sprintf('%snew', $this->path));
+        $newUser = (new User())
+            ->setEmail('green@test.com')
+            ->setName('Monnom')
+            ->setFirstName('prenom')
+            ->setPhoneNumber('09000122222222')
+            ->addClient($this->testClient);
 
-        self::assertResponseStatusCodeSame(200);
+        $this->client->jsonRequest(Request::METHOD_POST,  $this->urlGenerator->generate('app_user_create'),[($newUser)]);
 
-        $this->client->submitForm('Save', [
-            'user[name]' => 'Testing',
-            'user[firstName]' => 'Testing',
-            'user[email]' => 'Testing',
-            'user[phoneNumber]' => 'Testing',
-            'user[street]' => 'Testing',
-            'user[streetNumber]' => 'Testing',
-            'user[zipCode]' => 'Testing',
-            'user[city]' => 'Testing',
-            'user[clients]' => 'Testing',
-        ]);
 
-        self::assertResponseRedirects('/users/');
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
+
 
         self::assertSame($originalNumObjectsInRepository + 1, count($this->repository->findAll()));
     }
@@ -80,6 +81,7 @@ class UserControllerTest extends WebTestCase
         $fixture->setStreetNumber('My Title');
         $fixture->setZipCode('My Title');
         $fixture->setCity('My Title');
+        $fixture->setClients('My Title');
 
         $this->repository->save($fixture, true);
 

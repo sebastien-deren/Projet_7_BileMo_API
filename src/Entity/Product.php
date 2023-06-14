@@ -7,7 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Annotation\Groups;
-
+use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Attributes as OA;
 
 /**
  * @Serializer\XmlRoot("product")
@@ -17,12 +18,12 @@ use JMS\Serializer\Annotation\Groups;
  * @Hateoas\Relation(
  *     "self",
  *     href= "expr('api/products/' ~ object.getId())",
- *     exclusion = @Hateoas\Exclusion(groups="productDetails"))
+ *     exclusion = @Hateoas\Exclusion(groups="productList"))
  *
  * @Hateoas\Relation(
  *     "list",
  *     href="api/products",
- *     exclusion= @Hateoas\Exclusion(groups="productList"))
+ *     exclusion= @Hateoas\Exclusion(groups="productDetails"))
  */
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
