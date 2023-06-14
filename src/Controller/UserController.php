@@ -54,12 +54,10 @@ class UserController extends AbstractController
         return new JsonResponse($serializerService->serialize('userDetails', $user), Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/clients/{id}/users/{user_id}', name: 'app_user_delete', methods: 'delete')]
+    #[Route('/api/users/{id}', name: 'app_user_delete', methods: 'delete')]
     public function delete(
-        #[MapEntity(expr: 'repository.find(user_id)')]
         User              $user,
         SerializerService $serializer,
-        Client            $client,
         UserService       $service): JsonResponse
     {
         if ($client !== $this->getUser()) {
@@ -70,7 +68,7 @@ class UserController extends AbstractController
                 Response::HTTP_FORBIDDEN
             );
         }
-        $data = $service->delete($user, $client);
+        $data = $service->delete($user, $this->getUser());
         if (!$data) {
             return new JsonResponse('you don\'t have access to this client', Response::HTTP_FORBIDDEN, [], false);
         }
