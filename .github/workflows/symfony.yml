@@ -25,6 +25,8 @@ jobs:
       with:
         php-version: '8.2'
     - uses: actions/checkout@v3
+    - name: create local test
+      run: echo "DATABASE_URL=sqlite:///%kernel.project_dir%/data/database.sqlite" > env.test.local
     - name: Copy .env.test.local
       run: php -r "file_exists('.env.test.local') || copy('.env.test', '.env.test.local');"
     - name: Cache Composer packages
@@ -47,3 +49,6 @@ jobs:
       env:
         DATABASE_URL: sqlite:///%kernel.project_dir%/data/database.sqlite
       run: vendor/bin/phpunit
+    - name: remove .env.test.local
+    - run: rm .env.test.local
+
