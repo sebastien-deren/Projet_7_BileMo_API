@@ -31,7 +31,7 @@ class ExceptionSubscriber implements EventSubscriberInterface
             $exception instanceof \OutOfRangeException =>
             new JsonResponse($exception->getMessage(), 500),
             $exception instanceof \InvalidArgumentException || $exception instanceof NotFoundHttpException =>
-            new JsonResponse('No data found at this route', 404),
+            new JsonResponse('No data found at this route ', 404),
             $exception instanceof BadRequestException => new jsonResponse($exception->getMessage(),$exception->getCode()),
             $exception instanceof HttpException =>
             new JsonResponse("An internal error has occured", 500),

@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+
 class UserControllerTest extends WebTestCase
 {
     private KernelBrowser $client;
@@ -25,7 +26,7 @@ class UserControllerTest extends WebTestCase
     protected function setUp(): void
     {
 
-        $this->client = static::createClient(["base_uri"=>'http://127.0.0.1:8000']);
+        $this->client = static::createClient();
         $this->repository = static::getContainer()->get(UserRepository::class);
         $userRepository = static::getContainer()->get(ClientRepository::class);
         $this->testClient = $userRepository->findOneBy(["username" => 'green']);
@@ -39,8 +40,12 @@ class UserControllerTest extends WebTestCase
 
     public function testIndex(): void
     {
-        $this->markTestIncomplete();
-        $crawler = $this->client->request(Request::METHOD_GET,$this->urlGenerator->generate('app_user_list',['username'=>$this->testClient->getUsername()]));
+        self::markTestIncomplete();
+        $route = $this->urlGenerator->generate('app_user_list', ['username' => 'green', 'page' => 1, 'limit' => 10]);
+        dump($route);
+        $this->client->request(Request::METHOD_GET, 'api/clients/'.$this->testClient->getUsername().'/users');
+        $response = $this->client->getResponse();
+        dump($this->testClient->getUsername());
 
         self::assertResponseStatusCodeSame(200);
 
@@ -48,20 +53,16 @@ class UserControllerTest extends WebTestCase
         // self::assertSame('Some text on the page', $crawler->filter('.p')->first());
     }
 
-    public function testNew(): void
+    /**
+     * @dataProvider newUser
+     * @param array $array
+     * @return void
+     */
+    public function testNew(array $array): void
     {
-        $this->markTestIncomplete();
+        self::markTestIncomplete();
         $originalNumObjectsInRepository = count($this->repository->findAll());
-
-        $newUser = (new User())
-            ->setEmail('green@test.com')
-            ->setName('Monnom')
-            ->setFirstName('prenom')
-            ->setPhoneNumber('09000122222222')
-            ->addClient($this->testClient);
-
-        $this->client->jsonRequest(Request::METHOD_POST,  $this->urlGenerator->generate('app_user_create'),[($newUser)]);
-
+        $this->client->jsonRequest(Request::METHOD_POST, $this->urlGenerator->generate('app_user_create'), $array);
 
         self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
 
@@ -69,100 +70,51 @@ class UserControllerTest extends WebTestCase
         self::assertSame($originalNumObjectsInRepository + 1, count($this->repository->findAll()));
     }
 
-    public function testShow(): void
+    /**
+     * @dataProvider newUser
+     * @param object $user
+     * @return void
+     */
+    public function testShow(array $array): void
     {
-        $this->markTestIncomplete();
-        $fixture = new User();
-        $fixture->setName('My Title');
-        $fixture->setFirstName('My Title');
-        $fixture->setEmail('My Title');
-        $fixture->setPhoneNumber('My Title');
-        $fixture->setStreet('My Title');
-        $fixture->setStreetNumber('My Title');
-        $fixture->setZipCode('My Title');
-        $fixture->setCity('My Title');
-        $fixture->setClients('My Title');
 
-        $this->repository->save($fixture, true);
-
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
+        $user = $this->createUser($array,$this->testClient);
+        $this->client->request('GET', sprintf('%s%s', $this->path, $user->getId()));
 
         self::assertResponseStatusCodeSame(200);
-        self::assertPageTitleContains('User');
-
-        // Use assertions to check that the properties are properly displayed.
+        $this->repository->remove($user);
     }
 
-    public function testEdit(): void
+    /**
+     * @dataProvider newUser
+     * @return void
+     */
+    public function testRemove(array $array): void
     {
-        $this->markTestIncomplete();
-        $fixture = new User();
-        $fixture->setName('My Title');
-        $fixture->setFirstName('My Title');
-        $fixture->setEmail('My Title');
-        $fixture->setPhoneNumber('My Title');
-        $fixture->setStreet('My Title');
-        $fixture->setStreetNumber('My Title');
-        $fixture->setZipCode('My Title');
-        $fixture->setCity('My Title');
-        $fixture->setClients('My Title');
-
-        $this->repository->save($fixture, true);
-
-        $this->client->request('GET', sprintf('%s%s/edit', $this->path, $fixture->getId()));
-
-        $this->client->submitForm('Update', [
-            'user[name]' => 'Something New',
-            'user[firstName]' => 'Something New',
-            'user[email]' => 'Something New',
-            'user[phoneNumber]' => 'Something New',
-            'user[street]' => 'Something New',
-            'user[streetNumber]' => 'Something New',
-            'user[zipCode]' => 'Something New',
-            'user[city]' => 'Something New',
-            'user[clients]' => 'Something New',
-        ]);
-
-        self::assertResponseRedirects('/users/');
-
-        $fixture = $this->repository->findAll();
-
-        self::assertSame('Something New', $fixture[0]->getName());
-        self::assertSame('Something New', $fixture[0]->getFirstName());
-        self::assertSame('Something New', $fixture[0]->getEmail());
-        self::assertSame('Something New', $fixture[0]->getPhoneNumber());
-        self::assertSame('Something New', $fixture[0]->getStreet());
-        self::assertSame('Something New', $fixture[0]->getStreetNumber());
-        self::assertSame('Something New', $fixture[0]->getZipCode());
-        self::assertSame('Something New', $fixture[0]->getCity());
-        self::assertSame('Something New', $fixture[0]->getClients());
-    }
-
-    public function testRemove(): void
-    {
-        $this->markTestIncomplete();
 
         $originalNumObjectsInRepository = count($this->repository->findAll());
-
-        $fixture = new User();
-        $fixture->setName('My Title');
-        $fixture->setFirstName('My Title');
-        $fixture->setEmail('My Title');
-        $fixture->setPhoneNumber('My Title');
-        $fixture->setStreet('My Title');
-        $fixture->setStreetNumber('My Title');
-        $fixture->setZipCode('My Title');
-        $fixture->setCity('My Title');
-        $fixture->setClients('My Title');
-
-        $this->repository->save($fixture, true);
+        $user = $this->createUser($array,$this->testClient);
 
         self::assertSame($originalNumObjectsInRepository + 1, count($this->repository->findAll()));
 
-        $this->client->request('GET', sprintf('%s%s', $this->path, $fixture->getId()));
-        $this->client->submitForm('Delete');
+        $this->client->request('DELETE', sprintf('%s%s', $this->path, $user->getId()));
 
         self::assertSame($originalNumObjectsInRepository, count($this->repository->findAll()));
-        self::assertResponseRedirects('/users/');
+        self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+    }
+
+
+    public
+    function newUser(): array
+    {
+        return array(
+            array(array('name'=>'name','firstname'=>'firstname','email'=>'email@example.com','phoneNumber'=>'00000000000')),
+        );
+    }
+    public function createUser(array $array,Client $client){
+        $user = (new User)->setName($array['name'])->setFirstName($array['firstname'])->setEmail($array['email'])->setPhoneNumber($array['phoneNumber']);
+        $user->addClient($client);
+        $this->repository->save($user,true);
+        return $user;
     }
 }
