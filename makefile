@@ -3,7 +3,7 @@ SYMFONY = symfony
 SYMFONY_CONSOLE = $(SYMFONY) console
 SYMFONY_SERVER_START = $(SYMFONY) serve -d
 SYMFONY_SERVER_STOP = $(SYMFONY) server:stop
-SYMFONY_PROJECT_OPEN = $(SYMFONY) open:local
+SYMFONY_PROJECT_OPEN = $(SYMFONY) open:local -path=/api/doc
 
 #--DOCKER--#
 DOCKER =docker
