@@ -26,20 +26,22 @@ class UserService
     public function getValidUser(int $id, Client $client): User
     {
         $dataToGet = function ($param) {
-            $user = $this->repository->find($param['id']) ?? throw new RouteNotFoundException();
-            return $user->getClients()->contains($param['client']) ?
-                $user :
-                throw new AccessDeniedException(
-                    "you don't have the right to access this client",
-                    Response::HTTP_FORBIDDEN
-                );
+            return $this->repository->find($param['id']) ?? throw new RouteNotFoundException();
+
         };
 
-        return $this->cacheService->getCachedData(
+        $user= $this->cacheService->getCachedData(
             $dataToGet,
             $this->cacheNameDetail($id),
             'userDetail' . $id,
-            ['id' => $id, 'client' => $client]);
+            ['id' => $id]);
+        return $user->getClients()->contains($client) ?
+            $user :
+            throw new AccessDeniedException(
+                "you don't have the right to access this client",
+                Response::HTTP_FORBIDDEN
+            );
+
 
     }
 
@@ -79,8 +81,10 @@ class UserService
 
     public function create(User $user, Client $client): User
     {
-        if(!$this->verifyUser($user)){
-           throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
+
+        if (!$this->verifyUser($user)) {
+            throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
+
         }
         $user->initializeClients()->addClient($client);
         $this->repository->save($user, true);
@@ -109,7 +113,6 @@ class UserService
         }
         return true;
     }
-
 
 
 }
