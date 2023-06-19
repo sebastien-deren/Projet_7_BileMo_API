@@ -42,6 +42,7 @@ class UserService
                 Response::HTTP_FORBIDDEN
             );
 
+
     }
 
     public function cacheNameDetail(int $userId): string
@@ -80,8 +81,10 @@ class UserService
 
     public function create(User $user, Client $client): User
     {
+
         if (!$this->verifyUser($user)) {
             throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
+
         }
         $user->initializeClients()->addClient($client);
         $this->repository->save($user, true);
