@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +31,7 @@ class UserService
 
         };
 
-        $user= $this->cacheService->getCachedData(
+        $user = $this->cacheService->getCachedData(
             $dataToGet,
             $this->cacheNameDetail($id),
             'userDetail' . $id,
@@ -81,9 +82,11 @@ class UserService
 
     public function create(User $user, Client $client): User
     {
+        $error = $this->verifyUser($user);
 
-        if (!$this->verifyUser($user)) {
-            throw new BadRequestException("The user you tried to create misses some required information, see the documentation for more detail");
+        if (count($error) !==0) {
+            $errorArray=["entity"=>"user","invalid parameters"=>$error];
+            throw new BadRequestHttpException( json_encode($errorArray) );
 
         }
         $user->initializeClients()->addClient($client);
@@ -93,25 +96,24 @@ class UserService
 
     }
 
-    private function verifyUser(User $user): bool
+    private function verifyUser(User $user): array
     {
-        //to be reworked
-        if (!($user->getName() && $user->getFirstName() && $user->getEmail() && $user->getPhoneNumber())) {
-            return false;
+        $error = [];
+        if (null === $user->getName() || strlen(trim($user->getName())) < 3) {
+            $error ["name"] = " string longer than 3";
         }
-        if (strlen(trim($user->getName())) < 3) {
-            return false;
+        if (null === $user->getFirstName() || strlen(trim($user->getFirstName())) < 3) {
+            $error ["firstName"] = " string longer than 3";
         }
-        if (strlen(trim($user->getFirstName())) < 3) {
-            return false;
+
+        if (null === $user->getPhoneNumber() || strlen($user->getPhoneNumber() < 8)) {
+            $error ["phoneNumber"] = " string longer than 8";
         }
-        if (strlen($user->getEmail()) < 3 || !filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
-            return false;
+        if (null === $user->getEmail() || strlen($user->getEmail()) < 3 || !filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL)) {
+            $error ["email"] = " a valid email address (thing@example.com)";
+
         }
-        if (strlen($user->getPhoneNumber() < 8)) {
-            return false;
-        }
-        return true;
+        return $error;
     }
 
 

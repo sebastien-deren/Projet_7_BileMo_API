@@ -6,12 +6,13 @@ use PHPUnit\Util\Json;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class ExceptionSubscriber implements EventSubscriberInterface
 {
@@ -26,21 +27,16 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
             $this->logger->error($exception->getMessage() . " error code: " . $exception->getCode());
         }
-        $event->setResponse(match (true)
-        {
+        $event->setResponse(match (true) {
             $exception instanceof \OutOfRangeException =>
             new JsonResponse($exception->getMessage(), 500),
-            $exception instanceof \InvalidArgumentException || $exception instanceof NotFoundHttpException =>
-            new JsonResponse('No data found at this route ', 404),
-            $exception instanceof BadRequestException => new jsonResponse($exception->getMessage(),$exception->getCode()),
-            $exception instanceof HttpException =>
-            new JsonResponse("An internal error has occured", 500),
-            //default
+            $exception instanceof \InvalidArgumentException || $exception instanceof NotFoundHttpException => new JsonResponse('No data found at this route ', 404),
+            $exception instanceof BadRequestHttpException => new jsonResponse($exception->getMessage(), 400,[],true),
+            $exception->getCode() === 500 =>
+            new JsonResponse("An internal error has occurred,please contact us if the problem persist.", 500),
             true =>
             new JsonResponse([
-                'status' => $exception->getCode(),
-                'message' => $exception->getMessage(),
-                "exception" => $exception::class,
+                $exception->getMessage(),
             ])
         }
         );
@@ -48,11 +44,11 @@ class ExceptionSubscriber implements EventSubscriberInterface
 
     }
 
-        public
-        static function getSubscribedEvents(): array
-        {
-            return [
-                KernelEvents::EXCEPTION => 'onKernelException',
-            ];
-        }
+    public
+    static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::EXCEPTION => 'onKernelException',
+        ];
     }
+}
